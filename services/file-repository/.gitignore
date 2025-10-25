@@ -4,3 +4,5 @@ cmd/main
 
 playground/*
 
+minio_data
+
