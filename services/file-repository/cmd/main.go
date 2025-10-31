@@ -2,14 +2,47 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"os"
+	fileapplication "vega/packages/application/file"
+	objectstorage "vega/packages/infrastructure/object-storage"
+	storageconnection "vega/packages/infrastructure/object-storage/connection"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 func main() {
+	err := objectstorage.Driver.Connect(&storageconnection.Config{
+		URL: "localhost:9000",
+		Login: "minioadmin",
+		Password: "minioadmin",
+		Token: "",
+		Secure: false,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	file, err := objectstorage.Driver.GetFileByName(&fileapplication.GetFileByNameQuery{
+		FileName: "test-file.txt",
+		Bucket: "test-bucket",
+		Path: "/test-file.txt",
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	data, err := io.ReadAll(file.Reader)
+	if err != nil {
+		panic(err)
+	}
+
+	println(string(data))
+}
+
+func test() {
 	ctx := context.Background()
 
 	// Initialize MinIO client

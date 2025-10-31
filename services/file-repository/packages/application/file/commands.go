@@ -8,7 +8,7 @@ type UpdateFileCommand struct {
 
 }
 
-type DeleteFileCommand struct {
-
+type DeleteFilesCommand struct {
+	IDs	[]string	`json:"ids"`
 }
 

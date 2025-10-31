@@ -2,9 +2,9 @@ package minio
 
 import (
 	FileApplication "vega/packages/application/file"
-	MinIOCommandHandler "vega/packages/infrastructure/object-storage/MinIO/command-handler"
+	MinIOCommand "vega/packages/infrastructure/object-storage/MinIO/command"
 	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
-	MinIOQueryHandler "vega/packages/infrastructure/object-storage/MinIO/query-handler"
+	MinIOQuery "vega/packages/infrastructure/object-storage/MinIO/query"
 	StorageConnection "vega/packages/infrastructure/object-storage/connection"
 )
 
@@ -16,9 +16,9 @@ type Driver struct {
 
 func InitDriver() *Driver {
 	return &Driver{
-		Manager: MinIOConnection.Init(),
-		QueryHandler: MinIOQueryHandler.Init(),
-		CommandHandler: MinIOCommandHandler.Init(),
+		Manager: MinIOConnection.Manager,
+		QueryHandler: MinIOQuery.Handler,
+		CommandHandler: MinIOCommand.Handler,
 	}
 }
 

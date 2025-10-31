@@ -7,16 +7,14 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
-func Init() StorageConnection.Manager {
-	return &defaultConnectionManager{
-		// It would be 0 (StatusDisconnected) even if left it uninitialized,
-		// but anyway better to specify this explicitly
-		status: StorageConnection.Disconnected,
-	}
+var Manager = &defaultConnectionManager{
+	// It would be 0 (StatusDisconnected) even if left it uninitialized,
+	// but anyway better to specify this explicitly
+	status: StorageConnection.Disconnected,
 }
 
 type defaultConnectionManager struct {
-	client *minio.Client
+	Client *minio.Client
 	status StorageConnection.Status
 }
 
@@ -33,7 +31,7 @@ func (m *defaultConnectionManager) Connect(cfg *StorageConnection.Config) error 
 		return err
 	}
 
-	m.client = client
+	m.Client = client
 	m.status = StorageConnection.Connected
 
 	return nil

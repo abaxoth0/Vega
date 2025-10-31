@@ -1,6 +1,8 @@
 package fileapplication
 
-import "vega/packages/domain/entity"
+import (
+	"vega/packages/domain/entity"
+)
 
 type UseCases interface {
 	QueryHandler
@@ -8,12 +10,13 @@ type UseCases interface {
 }
 
 type QueryHandler interface {
-	GetFileByID(query GetFileByIdQuery) (*entity.File, error)
+	GetFileByName(query *GetFileByNameQuery) (*entity.FileStream, error)
+	SearchFilesByOwner(query *SearchFilesByOwnerQuery) ([]*entity.File, error)
 }
 
 type CommandHandler interface {
-	CreateFile(cmd CreateFileCommand) error
-	UpdateFile(cmd UpdateFileCommand) error
-	DeleteFile(cmd DeleteFileCommand) error
+	CreateFile(cmd *CreateFileCommand) error
+	UpdateFile(cmd *UpdateFileCommand) error
+	DeleteFiles(cmd *DeleteFilesCommand) error
 }
 

@@ -1,8 +1,10 @@
 package entity
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"io"
 	"slices"
 	"time"
 
@@ -169,4 +171,10 @@ func (m *FileMetadata) HasCategory(category string) bool {
 type File struct {
 	Meta    *FileMetadata
 	Content []byte
+}
+
+type FileStream struct {
+	Reader 	io.Reader
+	Context context.Context
+	Cancel 	context.CancelFunc
 }
