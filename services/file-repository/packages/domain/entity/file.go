@@ -158,14 +158,14 @@ func (m *FileMetadata) HasTag(tag string) bool {
 }
 
 func (m *FileMetadata) AddCategory(category string) {
-	if slices.Contains(m.Tags, category) {
+	if slices.Contains(m.Categories, category) {
 		return
 	}
 	m.Categories = append(m.Categories, category)
 }
 
 func (m *FileMetadata) HasCategory(category string) bool {
-	return slices.Contains(m.Tags, category)
+	return slices.Contains(m.Categories, category)
 }
 
 type File struct {
