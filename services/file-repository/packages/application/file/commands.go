@@ -1,7 +1,19 @@
 package fileapplication
 
-type CreateFileCommand struct {
+import (
+	"io"
+	"vega/packages/application"
+	"vega/packages/domain/entity"
+)
 
+type UploadFileCommand struct {
+	FileMeta 	*entity.FileMetadata
+	Content		io.Reader
+	ContentSize	int64
+	Path		string	`json:"path"`
+	Bucket 		string	`json:"bucket"`
+
+	application.CommandQuery
 }
 
 type UpdateFileCommand struct {

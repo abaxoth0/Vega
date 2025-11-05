@@ -15,7 +15,7 @@ type QueryHandler interface {
 }
 
 type CommandHandler interface {
-	CreateFile(cmd *CreateFileCommand) error
+	UploadFile(cmd *UploadFileCommand) error
 	UpdateFile(cmd *UpdateFileCommand) error
 	DeleteFiles(cmd *DeleteFilesCommand) error
 }

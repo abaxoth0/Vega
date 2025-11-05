@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io"
 	"log"
 	"os"
 	fileapplication "vega/packages/application/file"
@@ -26,7 +25,6 @@ func main() {
 	}
 
 	file, err := objectstorage.Driver.GetFileByName(&fileapplication.GetFileByNameQuery{
-		FileName: "test-file.txt",
 		Bucket: "test-bucket",
 		Path: "/test-file.txt",
 	})
@@ -34,12 +32,23 @@ func main() {
 		panic(err)
 	}
 
-	data, err := io.ReadAll(file.Reader)
-	if err != nil {
-		panic(err)
-	}
+	// data, err := io.ReadAll(file.Reader)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// println(string(data))
 
-	println(string(data))
+	e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
+		FileMeta: nil,
+		Content: file.Reader,
+		ContentSize: file.Size,
+		Path: "/my-directory/my-second-new-file.txt",
+		Bucket: "test-bucket",
+	})
+	if e != nil {
+		panic(e)
+	}
+	println("OK")
 }
 
 func test() {

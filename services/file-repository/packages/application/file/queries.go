@@ -1,16 +1,12 @@
 package fileapplication
 
-import (
-	"context"
-	"time"
-)
+import "vega/packages/application"
 
 type GetFileByNameQuery struct {
-	FileName		string	`json:"id"`
 	Bucket 			string	`json:"bucket"`
 	Path			string	`json:"path"`
-	Context			context.Context
-	ContextTimeout 	time.Duration
+
+	application.CommandQuery
 }
 
 type SearchFilesByOwnerQuery struct {
