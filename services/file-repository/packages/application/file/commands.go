@@ -10,8 +10,8 @@ type UploadFileCommand struct {
 	FileMeta 	*entity.FileMetadata
 	Content		io.Reader
 	ContentSize	int64
-	Path		string	`json:"path"`
-	Bucket 		string	`json:"bucket"`
+	Path		string
+	Bucket 		string
 
 	application.CommandQuery
 }

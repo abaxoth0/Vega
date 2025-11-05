@@ -3,13 +3,13 @@ package fileapplication
 import "vega/packages/application"
 
 type GetFileByNameQuery struct {
-	Bucket 			string	`json:"bucket"`
-	Path			string	`json:"path"`
+	Bucket 			string
+	Path			string
 
 	application.CommandQuery
 }
 
 type SearchFilesByOwnerQuery struct {
-	Owner	string	`json:"owner"`
+	Owner	string
 }
 
