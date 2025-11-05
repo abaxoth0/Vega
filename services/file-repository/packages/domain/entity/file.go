@@ -52,7 +52,6 @@ type FileMetadata struct {
 	Description string
 	Categories  []string
 	Tags        []string
-	ParentDir   string
 
 	UploadedAt time.Time
 	UpdatedAt  time.Time
@@ -82,7 +81,6 @@ func NewFrom(meta structs.Meta) (*FileMetadata, error) {
 	fileMeta.Description = meta["description"].(string)
 	fileMeta.Categories = meta["categories"].([]string)
 	fileMeta.Tags = meta["tags"].([]string)
-	fileMeta.ParentDir = meta["parent-dir"].(string)
 
 	fileMeta.Status = meta["status"].(FileStatus)
 	if err := fileMeta.Status.Validate(); err != nil {
@@ -134,7 +132,6 @@ func (m *FileMetadata) Pack() structs.Meta {
 	meta["description"] = m.Description
 	meta["categories"] = m.Categories
 	meta["tags"] = m.Tags
-	meta["parent-dir"] = m.ParentDir
 
 	meta["uploaded-at"] = m.UploadedAt
 	meta["updated-at"] = m.UpdatedAt
@@ -175,6 +172,7 @@ type File struct {
 
 type FileStream struct {
 	Reader 	io.Reader
+	Size	int64
 	Context context.Context
 	Cancel 	context.CancelFunc
 }
