@@ -10,7 +10,7 @@ type UseCases interface {
 }
 
 type QueryHandler interface {
-	GetFileByName(query *GetFileByNameQuery) (*entity.FileStream, error)
+	GetFileByPath(query *GetFileByPathQuery) (*entity.FileStream, error)
 	SearchFilesByOwner(query *SearchFilesByOwnerQuery) ([]*entity.File, error)
 }
 

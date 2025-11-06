@@ -2,7 +2,7 @@ package fileapplication
 
 import "vega/packages/application"
 
-type GetFileByNameQuery struct {
+type GetFileByPathQuery struct {
 	Bucket 			string
 	Path			string
 

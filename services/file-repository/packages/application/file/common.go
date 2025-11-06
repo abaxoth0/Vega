@@ -36,30 +36,3 @@ func ValidatePathFormat(path string) error {
 	return nil
 }
 
-var ErrInvalidPathFormat = errors.New("Invalid path format")
-
-func FileNameFromPath(path string) (string, error) {
-	if err := ValidatePathFormat(path); err != nil {
-		return "", err
-	}
-	if len(path) == 1 {
-		return "/", nil
-	}
-	offset := 0
-	if IsDirectory(path) {
-		offset++
-	}
-
-	fileName := ""
-	char := byte(0)
-
-	for i := len(path) - 1 - offset; i >= 0; i--  {
-		char = path[i]
-		if char == '/' {
-			return fileName, nil
-		}
-		fileName = string(char) + fileName
-	}
-
-	return "", ErrInvalidPathFormat
-}

@@ -19,18 +19,18 @@ type defaultQueryHandler struct {
 
 }
 
-func (m *defaultQueryHandler) GetFileByName(query *FileApplication.GetFileByNameQuery) (*entity.FileStream, error) {
+func (m *defaultQueryHandler) GetFileByPath(query *FileApplication.GetFileByPathQuery) (*entity.FileStream, error) {
 	if !query.CommandQuery.IsInit() {
 		application.InitDefaultCommandQuery(&query.CommandQuery)
 	}
 
+	err := FileApplication.ValidatePathFormat(query.Path)
+	if err != nil {
+		return nil, err
+	}
 	if FileApplication.IsDirectory(query.Path) {
 		// TODO need to make archive with all files in directory and send it
 		return nil, errors.New("Requested file is directory")
-	}
-	path, err := FileApplication.FileNameFromPath(query.Path)
-	if err != nil {
-		return nil, err
 	}
 
 	ctx, cancel := context.WithTimeout(query.Context, query.ContextTimeout)
@@ -39,7 +39,7 @@ func (m *defaultQueryHandler) GetFileByName(query *FileApplication.GetFileByName
 		return nil, err
 	}
 
-	object, err := storage.Client.GetObject(ctx, query.Bucket, path, minio.GetObjectOptions{})
+	object, err := storage.Client.GetObject(ctx, query.Bucket, query.Path, minio.GetObjectOptions{})
 	if err != nil {
 		return nil, err
 	}
