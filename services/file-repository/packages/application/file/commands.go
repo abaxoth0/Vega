@@ -21,6 +21,9 @@ type UpdateFileCommand struct {
 }
 
 type DeleteFilesCommand struct {
-	IDs	[]string	`json:"ids"`
+	Paths	[]string
+	Bucket 	string
+
+	application.CommandQuery
 }
 

@@ -24,13 +24,13 @@ func main() {
 		panic(err)
 	}
 
-	file, err := objectstorage.Driver.GetFileByName(&fileapplication.GetFileByNameQuery{
-		Bucket: "test-bucket",
-		Path: "/test-file.txt",
-	})
-	if err != nil {
-		panic(err)
-	}
+	// file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
+	// 	Bucket: "test-bucket",
+	// 	Path: "/my-new-file.txt",
+	// })
+	// if err != nil {
+	// 	panic(err)
+	// }
 
 	// data, err := io.ReadAll(file.Reader)
 	// if err != nil {
@@ -38,11 +38,15 @@ func main() {
 	// }
 	// println(string(data))
 
-	e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
-		FileMeta: nil,
-		Content: file.Reader,
-		ContentSize: file.Size,
-		Path: "/my-directory/my-second-new-file.txt",
+	// e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
+	// 	FileMeta: nil,
+	// 	Content: file.Reader,
+	// 	ContentSize: file.Size,
+	// 	Path: "/test4.txt",
+	// 	Bucket: "test-bucket",
+	// })
+	e := objectstorage.Driver.DeleteFiles(&fileapplication.DeleteFilesCommand{
+		Paths: []string{"/test1.txt", "/test2.txt", "/test4.txt"},
 		Bucket: "test-bucket",
 	})
 	if e != nil {
