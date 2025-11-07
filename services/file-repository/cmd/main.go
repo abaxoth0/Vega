@@ -15,18 +15,18 @@ import (
 
 func main() {
 	err := objectstorage.Driver.Connect(&storageconnection.Config{
-		URL: "localhost:9000",
-		Login: "minioadmin",
+		URL:      "localhost:9000",
+		Login:    "minioadmin",
 		Password: "minioadmin",
-		Token: "",
-		Secure: false,
+		Token:    "",
+		Secure:   false,
 	})
 	if err != nil {
 		panic(err)
 	}
 
 	file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
-		Path: "/my-new-file.txt",
+		Path:   "/my-new-file.txt",
 		Bucket: "test-bucket",
 	})
 	if err != nil {

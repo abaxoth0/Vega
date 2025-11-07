@@ -8,7 +8,7 @@ func IsDirectory(path string) bool {
 }
 
 const (
-	maxPathLength int = 1024
+	maxPathLength        int = 1024
 	maxPathSegmentLength int = 255
 )
 
@@ -35,4 +35,3 @@ func ValidatePathFormat(path string) error {
 	}
 	return nil
 }
-

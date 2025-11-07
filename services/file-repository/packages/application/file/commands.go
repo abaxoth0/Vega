@@ -7,35 +7,34 @@ import (
 )
 
 type UploadFileCommand struct {
-	FileMeta 	*entity.FileMetadata
-	Content		io.Reader
-	ContentSize	int64
-	Path		string
-	Bucket 		string
+	FileMeta    *entity.FileMetadata
+	Content     io.Reader
+	ContentSize int64
+	Path        string
+	Bucket      string
 
 	application.CommandQuery
 }
 
 type UpdateFileMetadataCommand struct {
-	Path 		string
-	Bucket		string
-	NewMetadata	*entity.FileMetadata
+	Path        string
+	Bucket      string
+	NewMetadata *entity.FileMetadata
 
 	application.CommandQuery
 }
 
 type UpdateFileContentCommand struct {
-	Path 		string
-	Bucket 		string
-	NewContent 	[]byte
+	Path       string
+	Bucket     string
+	NewContent []byte
 
 	application.CommandQuery
 }
 
 type DeleteFilesCommand struct {
-	Paths	[]string
-	Bucket 	string
+	Paths  []string
+	Bucket string
 
 	application.CommandQuery
 }
-

@@ -6,8 +6,8 @@ import (
 )
 
 type CommandQuery struct {
-	Context			context.Context
-	ContextTimeout 	time.Duration
+	Context        context.Context
+	ContextTimeout time.Duration
 }
 
 // Verifies that both context and it's timeout are exist and valid.
@@ -26,4 +26,3 @@ func InitDefaultCommandQuery(c *CommandQuery) {
 		c.ContextTimeout = time.Second * 3
 	}
 }
-

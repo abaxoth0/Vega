@@ -16,9 +16,8 @@ type Driver struct {
 
 func InitDriver() *Driver {
 	return &Driver{
-		Manager: MinIOConnection.Manager,
-		QueryHandler: MinIOQuery.Handler,
+		Manager:        MinIOConnection.Manager,
+		QueryHandler:   MinIOQuery.Handler,
 		CommandHandler: MinIOCommand.Handler,
 	}
 }
-

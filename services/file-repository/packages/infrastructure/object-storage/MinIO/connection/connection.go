@@ -43,4 +43,3 @@ func (m *defaultConnectionManager) Connect(cfg *StorageConnection.Config) error 
 func (m *defaultConnectionManager) Disconnect() error {
 	return nil
 }
-

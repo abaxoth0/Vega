@@ -20,4 +20,3 @@ func IsBucketExist(ctx context.Context, bucket string) error {
 	}
 	return nil
 }
-

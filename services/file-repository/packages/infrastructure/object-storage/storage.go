@@ -12,4 +12,3 @@ type ObjectStorageDriver interface {
 }
 
 var Driver ObjectStorageDriver = minio.InitDriver()
-

@@ -18,7 +18,6 @@ import (
 var Handler FileApplication.CommandHandler = new(defaultCommandHandler)
 
 type defaultCommandHandler struct {
-
 }
 
 var storage = MinIOConnection.Manager
@@ -144,4 +143,3 @@ func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesComm
 
 	return nil
 }
-

@@ -12,11 +12,11 @@ const (
 // Even if this would require some refactored in the future it won't cause much problems.
 // The same goes for DI.
 type Config struct {
-	URL 		string
-	Login 		string
-	Password 	string
-	Token		string
-	Secure		bool
+	URL      string
+	Login    string
+	Password string
+	Token    string
+	Secure   bool
 }
 
 type Manager interface {
@@ -24,4 +24,3 @@ type Manager interface {
 	Connect(cfg *Config) error
 	Disconnect() error
 }
-

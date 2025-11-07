@@ -56,6 +56,10 @@ func (m *defaultQueryHandler) GetFileByPath(query *FileApplication.GetFileByPath
 	}, nil
 }
 
+func (m *defaultQueryHandler) GetFileMetadataByPath(query *FileApplication.GetFileByPathQuery) (*entity.FileMetadata, error) {
+	return nil, nil
+}
+
 func (m *defaultQueryHandler) SearchFilesByOwner(query *FileApplication.SearchFilesByOwnerQuery) ([]*entity.File, error) {
 	return nil, nil
 }
