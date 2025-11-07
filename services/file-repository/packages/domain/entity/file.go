@@ -171,8 +171,8 @@ type File struct {
 }
 
 type FileStream struct {
-	Reader 	io.Reader
-	Size	int64
+	Content io.Reader
+	Size    int64
 	Context context.Context
-	Cancel 	context.CancelFunc
+	Cancel  context.CancelFunc
 }

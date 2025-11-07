@@ -49,7 +49,7 @@ func (m *defaultQueryHandler) GetFileByPath(query *FileApplication.GetFileByPath
 	}
 
 	return &entity.FileStream{
-		Reader: object,
+		Content: object,
 		Size: stat.Size,
 		Context: ctx,
 		Cancel: cancel,
