@@ -28,6 +28,9 @@ var fileStatuses = map[FileStatus]bool{
 }
 
 func (s FileStatus) Validate() error {
+	if s == "" {
+		return errors.New("file status is empty")
+	}
 	if _, ok := fileStatuses[s]; !ok {
 		return fmt.Errorf("file status \"%s\" doesn't exist", s)
 	}
@@ -36,12 +39,12 @@ func (s FileStatus) Validate() error {
 
 type FileMetadata struct {
 	ID           string
-	Originalname string
-	StoragePath  string
+	OriginalName string
+	Path  		 string
 
 	Encoding     string
 	MIMEType     string
-	Size         uint64
+	Size         int64
 	Checksum     string
 	ChecksumType string
 
@@ -61,16 +64,16 @@ type FileMetadata struct {
 	Status FileStatus
 }
 
-func NewFrom(meta structs.Meta) (*FileMetadata, error) {
+func NewFileMetadata(meta structs.Meta) (*FileMetadata, error) {
 	fileMeta := new(FileMetadata)
 
 	fileMeta.ID = meta["id"].(string)
-	fileMeta.Originalname = meta["original-name"].(string)
-	fileMeta.StoragePath = meta["storage-path"].(string)
+	fileMeta.OriginalName = meta["original-name"].(string)
+	fileMeta.Path, _ = meta["storage-path"].(string)
 
 	fileMeta.Encoding = meta["encoding"].(string)
 	fileMeta.MIMEType = meta["mime-type"].(string)
-	fileMeta.Size = meta["size"].(uint64)
+	fileMeta.Size = meta["size"].(int64)
 	fileMeta.Checksum = meta["checksum"].(string)
 	fileMeta.ChecksumType = meta["checksum-type"].(string)
 
@@ -80,7 +83,7 @@ func NewFrom(meta structs.Meta) (*FileMetadata, error) {
 
 	fileMeta.Description = meta["description"].(string)
 	fileMeta.Categories = meta["categories"].([]string)
-	fileMeta.Tags = meta["tags"].([]string)
+	fileMeta.Tags = meta["tags"].([]string)  // TODO: refactor this from []string to map[string]string?
 
 	fileMeta.Status = meta["status"].(FileStatus)
 	if err := fileMeta.Status.Validate(); err != nil {
@@ -116,8 +119,8 @@ func (m *FileMetadata) Pack() structs.Meta {
 	meta := make(structs.Meta)
 
 	meta["id"] = m.ID
-	meta["original-name"] = m.Originalname
-	meta["storage-path"] = m.StoragePath
+	meta["original-name"] = m.OriginalName
+	meta["storage-path"] = m.Path
 
 	meta["encoding"] = m.Encoding
 	meta["mime-type"] = m.MIMEType

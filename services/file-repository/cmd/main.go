@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"io"
+	"fmt"
 	"log"
 	"os"
 	fileapplication "vega/packages/application/file"
@@ -15,28 +15,28 @@ import (
 
 func main() {
 	err := objectstorage.Driver.Connect(&storageconnection.Config{
-		URL:      "localhost:9000",
-		Login:    "minioadmin",
+		URL: "localhost:9000",
+		Login: "minioadmin",
 		Password: "minioadmin",
-		Token:    "",
-		Secure:   false,
+		Token: "",
+		Secure: false,
 	})
 	if err != nil {
 		panic(err)
 	}
 
-	file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
-		Path:   "/my-new-file.txt",
-		Bucket: "test-bucket",
-	})
-	if err != nil {
-		panic(err)
-	}
-	data, err := io.ReadAll(file.Reader)
-	if err != nil {
-		panic(err)
-	}
-	println(string(data))
+	// file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
+	// 	Path: "/my-new-file.txt",
+	// 	Bucket: "test-bucket",
+	// })
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// data, err := io.ReadAll(file.Content)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// println(string(data))
 
 	// e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
 	// 	FileMeta: nil,
@@ -54,9 +54,19 @@ func main() {
 	// 	Bucket: "test-bucket",
 	// 	NewContent: []byte("full replace upd test"),
 	// })
-	// if e != nil {
-	// 	panic(e)
-	// }
+
+
+	meta, e := objectstorage.Driver.GetFileMetadataByPath(&fileapplication.GetFileByPathQuery{
+		Path: "/my-new-file.txt",
+		Bucket: "test-bucket",
+	})
+
+	if e != nil {
+		panic(e)
+	}
+
+	fmt.Printf("%+v\n", *meta)
+
 	println("OK")
 }
 
