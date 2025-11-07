@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"os"
 	fileapplication "vega/packages/application/file"
@@ -24,19 +25,18 @@ func main() {
 		panic(err)
 	}
 
-	// file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
-	// 	Bucket: "test-bucket",
-	// 	Path: "/my-new-file.txt",
-	// })
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	// data, err := io.ReadAll(file.Reader)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// println(string(data))
+	file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
+		Path: "/my-new-file.txt",
+		Bucket: "test-bucket",
+	})
+	if err != nil {
+		panic(err)
+	}
+	data, err := io.ReadAll(file.Reader)
+	if err != nil {
+		panic(err)
+	}
+	println(string(data))
 
 	// e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
 	// 	FileMeta: nil,
@@ -45,13 +45,18 @@ func main() {
 	// 	Path: "/test4.txt",
 	// 	Bucket: "test-bucket",
 	// })
-	e := objectstorage.Driver.DeleteFiles(&fileapplication.DeleteFilesCommand{
-		Paths: []string{"/test1.txt", "/test2.txt", "/test4.txt"},
-		Bucket: "test-bucket",
-	})
-	if e != nil {
-		panic(e)
-	}
+	// e := objectstorage.Driver.DeleteFiles(&fileapplication.DeleteFilesCommand{
+	// 	Paths: []string{"/test1.txt", "/test2.txt", "/test4.txt"},
+	// 	Bucket: "test-bucket",
+	// })
+	// e := objectstorage.Driver.UpdateFileContent(&fileapplication.UpdateFileContentCommand{
+	// 	Path: "/my-new-file.txt",
+	// 	Bucket: "test-bucket",
+	// 	NewContent: []byte("full replace upd test"),
+	// })
+	// if e != nil {
+	// 	panic(e)
+	// }
 	println("OK")
 }
 

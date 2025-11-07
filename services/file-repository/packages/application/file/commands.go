@@ -16,8 +16,20 @@ type UploadFileCommand struct {
 	application.CommandQuery
 }
 
-type UpdateFileCommand struct {
+type UpdateFileMetadataCommand struct {
+	Path 		string
+	Bucket		string
+	NewMetadata	*entity.FileMetadata
 
+	application.CommandQuery
+}
+
+type UpdateFileContentCommand struct {
+	Path 		string
+	Bucket 		string
+	NewContent 	[]byte
+
+	application.CommandQuery
 }
 
 type DeleteFilesCommand struct {

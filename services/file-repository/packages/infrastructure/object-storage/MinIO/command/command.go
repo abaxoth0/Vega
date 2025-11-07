@@ -1,6 +1,7 @@
 package miniocommand
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -52,7 +53,36 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 	return nil
 }
 
-func (h *defaultCommandHandler) UpdateFile(cmd *FileApplication.UpdateFileCommand) error {
+func (h *defaultCommandHandler) UpdateFileMetadata(cmd *FileApplication.UpdateFileMetadataCommand) error {
+	return nil
+}
+
+func (h *defaultCommandHandler) fullReplace(ctx context.Context, bucket string, path string, content []byte) error {
+	size := int64(len(content))
+
+	_, err := storage.Client.PutObject(ctx, bucket, path, bytes.NewReader(content), size, minio.PutObjectOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *defaultCommandHandler) UpdateFileContent(cmd *FileApplication.UpdateFileContentCommand) error {
+	if !cmd.CommandQuery.IsInit() {
+		application.InitDefaultCommandQuery(&cmd.CommandQuery)
+	}
+	if err := FileApplication.ValidatePathFormat(cmd.Path); err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
+	defer cancel()
+
+	if err := h.fullReplace(ctx, cmd.Bucket, cmd.Path, cmd.NewContent); err != nil {
+		return err
+	}
+
 	return nil
 }
 
