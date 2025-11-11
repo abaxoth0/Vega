@@ -110,12 +110,12 @@ func (h *defaultQueryHandler) GetFileMetadataByPath(query *FileApplication.GetFi
 	meta["created-at"] = stat.UserMetadata["created-at"]
 	meta["accessed-at"] = stat.UserMetadata["accessed-at"]
 
-	metadata, err := entity.NewFileMetadata(meta)
+	structuredMetadata, err := entity.NewFileMetadata(meta)
 	if err != nil {
 		return nil, err
 	}
 
-	return metadata, nil
+	return structuredMetadata, nil
 }
 
 func (h *defaultQueryHandler) SearchFilesByOwner(query *FileApplication.SearchFilesByOwnerQuery) ([]*entity.File, error) {

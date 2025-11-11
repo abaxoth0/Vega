@@ -5,13 +5,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"path"
 	"strconv"
 	"strings"
+	"time"
 	"vega/packages/application"
 	FileApplication "vega/packages/application/file"
+	"vega/packages/domain/entity"
 	MinIOCommon "vega/packages/infrastructure/object-storage/MinIO/common"
+	miniocommon "vega/packages/infrastructure/object-storage/MinIO/common"
 	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
 
+	"github.com/abaxoth0/Vega/go-libs/packages/structs"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -44,7 +49,19 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 	if err := MinIOCommon.IsBucketExist(ctx, cmd.Bucket); err != nil {
 		return err
 	}
-	_, err := storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, cmd.Content, cmd.ContentSize, minio.PutObjectOptions{})
+
+	meta := entity.FileMetadata{
+		UploadedAt: time.Now(),
+		CreatedAt: time.Now(), // TODO temp
+		Status: entity.ActiveFileStatus,
+		Size: cmd.ContentSize,
+		OriginalName: path.Base(cmd.Path),
+		Path: cmd.Path,
+	}
+
+	_, err := storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, cmd.Content, cmd.ContentSize, minio.PutObjectOptions{
+		UserMetadata: miniocommon.ConvertToRawMetadata(meta.Pack()),
+	})
 	if err != nil {
 		return err
 	}
@@ -53,6 +70,50 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 }
 
 func (h *defaultCommandHandler) UpdateFileMetadata(cmd *FileApplication.UpdateFileMetadataCommand) error {
+	if !cmd.CommandQuery.IsInit() {
+		application.InitDefaultCommandQuery(&cmd.CommandQuery)
+	}
+	if err := FileApplication.ValidatePathFormat(cmd.Path); err != nil {
+		return err
+	}
+
+	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
+	defer cancel()
+
+
+	info, err := storage.Client.StatObject(ctx, cmd.Bucket, cmd.Path, minio.StatObjectOptions{})
+	if err != nil {
+		return err
+	}
+
+	if info.Size < entity.SmallFileSizeThreshold {
+		return h.copyWithNewMetadata(ctx, cmd.Bucket, cmd.Path, cmd.NewMetadata)
+	}
+
+	return errors.New("bigus")
+}
+
+func (h *defaultCommandHandler) copyWithNewMetadata(
+	ctx context.Context,
+	bucket string,
+	path string,
+	newMetadata structs.Meta,
+) error {
+	src := minio.CopySrcOptions{
+		Bucket: bucket,
+		Object: path,
+	}
+	dest := minio.CopyDestOptions{
+		Bucket: bucket,
+		Object: path,
+		UserMetadata: miniocommon.ConvertToRawMetadata(newMetadata),
+		ReplaceMetadata: true,
+	}
+
+	_, err := storage.Client.CopyObject(ctx, dest, src)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

@@ -4,6 +4,8 @@ import (
 	"io"
 	"vega/packages/application"
 	"vega/packages/domain/entity"
+
+	"github.com/abaxoth0/Vega/go-libs/packages/structs"
 )
 
 type UploadFileCommand struct {
@@ -19,7 +21,7 @@ type UploadFileCommand struct {
 type UpdateFileMetadataCommand struct {
 	Path        string
 	Bucket      string
-	NewMetadata *entity.FileMetadata
+	NewMetadata structs.Meta
 
 	application.CommandQuery
 }

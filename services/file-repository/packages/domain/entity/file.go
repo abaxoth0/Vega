@@ -11,6 +11,10 @@ import (
 	"github.com/abaxoth0/Vega/go-libs/packages/structs"
 )
 
+const (
+	SmallFileSizeThreshold = 10 * 1024 * 1024 // 10 MB
+)
+
 type FileStatus string
 
 const (
@@ -35,6 +39,10 @@ func (s FileStatus) Validate() error {
 		return fmt.Errorf("file status \"%s\" doesn't exist", s)
 	}
 	return nil
+}
+
+func (s FileStatus) String() string {
+	return string(s)
 }
 
 type FileMetadata struct {
@@ -120,7 +128,7 @@ func (m *FileMetadata) Pack() structs.Meta {
 
 	meta["id"] = m.ID
 	meta["original-name"] = m.OriginalName
-	meta["storage-path"] = m.Path
+	meta["path"] = m.Path
 
 	meta["encoding"] = m.Encoding
 	meta["mime-type"] = m.MIMEType

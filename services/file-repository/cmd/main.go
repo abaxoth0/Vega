@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	fileapplication "vega/packages/application/file"
@@ -25,26 +24,26 @@ func main() {
 		panic(err)
 	}
 
-	// file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
-	// 	Path: "/my-new-file.txt",
-	// 	Bucket: "test-bucket",
-	// })
-	// if err != nil {
-	// 	panic(err)
-	// }
+	file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
+		Path: "/my-new-file.txt",
+		Bucket: "test-bucket",
+	})
+	if err != nil {
+		panic(err)
+	}
 	// data, err := io.ReadAll(file.Content)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	// println(string(data))
 
-	// e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
-	// 	FileMeta: nil,
-	// 	Content: file.Reader,
-	// 	ContentSize: file.Size,
-	// 	Path: "/test4.txt",
-	// 	Bucket: "test-bucket",
-	// })
+	e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
+		FileMeta: nil,
+		Content: file.Content,
+		ContentSize: file.Size,
+		Path: "/meta-test.txt",
+		Bucket: "test-bucket",
+	})
 	// e := objectstorage.Driver.DeleteFiles(&fileapplication.DeleteFilesCommand{
 	// 	Paths: []string{"/test1.txt", "/test2.txt", "/test4.txt"},
 	// 	Bucket: "test-bucket",
@@ -56,16 +55,16 @@ func main() {
 	// })
 
 
-	meta, e := objectstorage.Driver.GetFileMetadataByPath(&fileapplication.GetFileByPathQuery{
-		Path: "/my-new-file.txt",
-		Bucket: "test-bucket",
-	})
-
+	// meta, e := objectstorage.Driver.GetFileMetadataByPath(&fileapplication.GetFileByPathQuery{
+	// 	Path: "/my-new-file.txt",
+	// 	Bucket: "test-bucket",
+	// })
+	//
 	if e != nil {
 		panic(e)
 	}
 
-	fmt.Printf("%+v\n", *meta)
+	// fmt.Printf("%+v\n", *meta)
 
 	println("OK")
 }
