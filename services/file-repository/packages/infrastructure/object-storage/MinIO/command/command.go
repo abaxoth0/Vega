@@ -54,7 +54,6 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		UploadedAt: time.Now(),
 		CreatedAt: time.Now(), // TODO temp
 		Status: entity.ActiveFileStatus,
-		Size: cmd.ContentSize,
 		OriginalName: path.Base(cmd.Path),
 		Path: cmd.Path,
 	}
