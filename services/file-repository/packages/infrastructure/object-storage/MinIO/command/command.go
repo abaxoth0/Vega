@@ -31,11 +31,18 @@ type defaultCommandHandler struct {
 
 var storage = MinIOConnection.Manager
 
-func (h *defaultCommandHandler) Mkdir(cmd *FileApplication.MkdirCommand) error {
-	if !cmd.CommandQuery.IsInit() {
-		application.InitDefaultCommandQuery(&cmd.CommandQuery)
+func (h *defaultCommandHandler) preprocessCommand(commandQuery *application.CommandQuery, path string) error {
+	if !commandQuery.IsInit() {
+		application.InitDefaultCommandQuery(commandQuery)
 	}
-	if err := FileApplication.ValidatePathFormat(cmd.Path); err != nil {
+	if err := FileApplication.ValidatePathFormat(path); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (h *defaultCommandHandler) Mkdir(cmd *FileApplication.MkdirCommand) error {
+	if err := h.preprocessCommand(&cmd.CommandQuery, cmd.Path); err != nil {
 		return err
 	}
 	if ok := FileApplication.IsDirectory(cmd.Path); !ok {
@@ -55,15 +62,11 @@ func (h *defaultCommandHandler) Mkdir(cmd *FileApplication.MkdirCommand) error {
 }
 
 func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileCommand) error {
-	if !cmd.CommandQuery.IsInit() {
-		application.InitDefaultCommandQuery(&cmd.CommandQuery)
+	if err := h.preprocessCommand(&cmd.CommandQuery, cmd.Path); err != nil {
+		return err
 	}
-
 	if cmd.ContentSize <= 0 {
 		return errors.New("Content size cannot be equal or less than 0, but got " + strconv.FormatInt(cmd.ContentSize, 10))
-	}
-	if err := FileApplication.ValidatePathFormat(cmd.Path); err != nil {
-		return err
 	}
 	if FileApplication.IsDirectory(cmd.Path) {
 		// TODO (FEAT): Allow upload archives as directories (using flag in cmd?)
@@ -112,10 +115,7 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 }
 
 func (h *defaultCommandHandler) UpdateFileMetadata(cmd *FileApplication.UpdateFileMetadataCommand) error {
-	if !cmd.CommandQuery.IsInit() {
-		application.InitDefaultCommandQuery(&cmd.CommandQuery)
-	}
-	if err := FileApplication.ValidatePathFormat(cmd.Path); err != nil {
+	if err := h.preprocessCommand(&cmd.CommandQuery, cmd.Path); err != nil {
 		return err
 	}
 
@@ -170,10 +170,7 @@ func (h *defaultCommandHandler) fullReplace(ctx context.Context, bucket string, 
 }
 
 func (h *defaultCommandHandler) UpdateFileContent(cmd *FileApplication.UpdateFileContentCommand) error {
-	if !cmd.CommandQuery.IsInit() {
-		application.InitDefaultCommandQuery(&cmd.CommandQuery)
-	}
-	if err := FileApplication.ValidatePathFormat(cmd.Path); err != nil {
+	if err := h.preprocessCommand(&cmd.CommandQuery, cmd.Path); err != nil {
 		return err
 	}
 
