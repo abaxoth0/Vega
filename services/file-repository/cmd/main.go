@@ -24,26 +24,26 @@ func main() {
 		panic(err)
 	}
 
-	file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
-		Path: "/my-new-file.txt",
-		Bucket: "test-bucket",
-	})
-	if err != nil {
-		panic(err)
-	}
+	// file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
+	// 	Path: "/my-new-file.txt",
+	// 	Bucket: "test-bucket",
+	// })
+	// if err != nil {
+	// 	panic(err)
+	// }
 	// data, err := io.ReadAll(file.Content)
 	// if err != nil {
 	// 	panic(err)
 	// }
 	// println(string(data))
 
-	e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
-		FileMeta: nil,
-		Content: file.Content,
-		ContentSize: file.Size,
-		Path: "/mime-test.txt",
-		Bucket: "test-bucket",
-	})
+	// e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
+	// 	FileMeta: nil,
+	// 	Content: file.Content,
+	// 	ContentSize: file.Size,
+	// 	Path: "/mime-test.txt",
+	// 	Bucket: "test-bucket",
+	// })
 	// e := objectstorage.Driver.DeleteFiles(&fileapplication.DeleteFilesCommand{
 	// 	Paths: []string{"/test1.txt", "/test2.txt", "/test4.txt"},
 	// 	Bucket: "test-bucket",
@@ -60,6 +60,11 @@ func main() {
 	// 	Bucket: "test-bucket",
 	// })
 	//
+
+	e := objectstorage.Driver.Mkdir(&fileapplication.MkdirCommand{
+		Path: "/my/directory/",
+		Bucket: "test-bucket",
+	})
 	if e != nil {
 		panic(e)
 	}

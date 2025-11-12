@@ -2,6 +2,8 @@ package fileapplication
 
 import "errors"
 
+var ErrFileIsNotDirectory = errors.New("file is not directory")
+
 func IsDirectory(path string) bool {
 	// If file ends with '/' this file is directory
 	return path[len(path)-1] == '/'
@@ -12,15 +14,20 @@ const (
 	maxPathSegmentLength int = 255
 )
 
+var ErrMaxPathLengthExceeded = errors.New("max path length exceeded")
+var ErrEmptyPath = errors.New("empty path")
+var ErrInvalidPathFormat = errors.New("invalid path format: path must begin with \"/\"")
+var ErrMaxPathSegmentLengthExceeded = errors.New("max path's segment length exceeded")
+
 func ValidatePathFormat(path string) error {
 	if len(path) > maxPathLength {
-		return errors.New("max path length exceeded")
+		return ErrMaxPathLengthExceeded
 	}
 	if len(path) == 0 {
-		return errors.New("empty path")
+		return ErrEmptyPath
 	}
 	if path[0] != '/' {
-		return errors.New("invalid path format: path must begin with \"/\"")
+		return ErrInvalidPathFormat
 	}
 	count := 0
 	for char := range path {
@@ -30,7 +37,7 @@ func ValidatePathFormat(path string) error {
 		}
 		count++
 		if count > maxPathSegmentLength {
-			return errors.New("max path's segment length exceeded")
+			return ErrMaxPathSegmentLengthExceeded
 		}
 	}
 	return nil

@@ -8,6 +8,13 @@ import (
 	"github.com/abaxoth0/Vega/libs/go/packages/structs"
 )
 
+type MkdirCommand struct {
+	Bucket 	string
+	Path 	string
+
+	application.CommandQuery
+}
+
 type UploadFileCommand struct {
 	FileMeta    *entity.FileMetadata
 	Content     io.Reader

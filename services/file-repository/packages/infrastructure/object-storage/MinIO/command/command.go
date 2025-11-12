@@ -31,6 +31,29 @@ type defaultCommandHandler struct {
 
 var storage = MinIOConnection.Manager
 
+func (h *defaultCommandHandler) Mkdir(cmd *FileApplication.MkdirCommand) error {
+	if !cmd.CommandQuery.IsInit() {
+		application.InitDefaultCommandQuery(&cmd.CommandQuery)
+	}
+	if err := FileApplication.ValidatePathFormat(cmd.Path); err != nil {
+		return err
+	}
+	if ok := FileApplication.IsDirectory(cmd.Path); !ok {
+		return FileApplication.ErrFileIsNotDirectory
+	}
+
+	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
+	defer cancel()
+
+	_, err := storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, nil, 0, minio.PutObjectOptions{
+	})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileCommand) error {
 	if !cmd.CommandQuery.IsInit() {
 		application.InitDefaultCommandQuery(&cmd.CommandQuery)
@@ -98,7 +121,6 @@ func (h *defaultCommandHandler) UpdateFileMetadata(cmd *FileApplication.UpdateFi
 
 	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
 	defer cancel()
-
 
 	info, err := storage.Client.StatObject(ctx, cmd.Bucket, cmd.Path, minio.StatObjectOptions{})
 	if err != nil {

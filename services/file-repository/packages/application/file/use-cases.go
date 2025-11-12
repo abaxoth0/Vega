@@ -16,6 +16,7 @@ type QueryHandler interface {
 }
 
 type CommandHandler interface {
+	Mkdir(cmd *MkdirCommand) error
 	UploadFile(cmd *UploadFileCommand) error
 	UpdateFileContent(cmd *UpdateFileContentCommand) error
 	UpdateFileMetadata(cmd *UpdateFileMetadataCommand) error
