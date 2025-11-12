@@ -1,7 +1,6 @@
 go 1.23.0
 
 use (
-    ./libs/go
-    ./services/file-repository
+	./libs/go
+	./services/file-repository
 )
-

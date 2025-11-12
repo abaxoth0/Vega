@@ -8,7 +8,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/abaxoth0/Vega/go-libs/packages/structs"
+	"github.com/abaxoth0/Vega/libs/go/packages/structs"
 )
 
 const (

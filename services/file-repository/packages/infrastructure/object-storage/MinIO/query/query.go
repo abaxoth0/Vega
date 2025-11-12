@@ -10,7 +10,7 @@ import (
 	MinIOCommon "vega/packages/infrastructure/object-storage/MinIO/common"
 	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
 
-	"github.com/abaxoth0/Vega/go-libs/packages/structs"
+	"github.com/abaxoth0/Vega/libs/go/packages/structs"
 	"github.com/minio/minio-go/v7"
 )
 

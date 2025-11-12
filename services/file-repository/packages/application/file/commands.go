@@ -5,7 +5,7 @@ import (
 	"vega/packages/application"
 	"vega/packages/domain/entity"
 
-	"github.com/abaxoth0/Vega/go-libs/packages/structs"
+	"github.com/abaxoth0/Vega/libs/go/packages/structs"
 )
 
 type UploadFileCommand struct {

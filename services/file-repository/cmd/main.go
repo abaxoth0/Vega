@@ -41,7 +41,7 @@ func main() {
 		FileMeta: nil,
 		Content: file.Content,
 		ContentSize: file.Size,
-		Path: "/meta-test.txt",
+		Path: "/mime-test.txt",
 		Bucket: "test-bucket",
 	})
 	// e := objectstorage.Driver.DeleteFiles(&fileapplication.DeleteFilesCommand{

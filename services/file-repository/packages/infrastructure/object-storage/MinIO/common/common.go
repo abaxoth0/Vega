@@ -9,7 +9,7 @@ import (
 	"vega/packages/domain/entity"
 	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
 
-	"github.com/abaxoth0/Vega/go-libs/packages/structs"
+	"github.com/abaxoth0/Vega/libs/go/packages/structs"
 )
 
 var storage = MinIOConnection.Manager

@@ -3,8 +3,11 @@ package miniocommand
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
+	"io"
 	"path"
 	"strconv"
 	"strings"
@@ -16,7 +19,8 @@ import (
 	miniocommon "vega/packages/infrastructure/object-storage/MinIO/common"
 	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
 
-	"github.com/abaxoth0/Vega/go-libs/packages/structs"
+	"github.com/abaxoth0/Vega/libs/go/packages/structs"
+	"github.com/gabriel-vasile/mimetype"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -50,15 +54,31 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		return err
 	}
 
+	hasher := sha256.New()
+	teedStream := io.TeeReader(cmd.Content, hasher)
+	mimeBuffer := make([]byte, 512)
+
+	n, err := teedStream.Read(mimeBuffer)
+	if err != nil && err != io.EOF {
+		return err
+	}
+
+	mimeType := mimetype.Detect(mimeBuffer[:n])
+
+	multiPartStream := io.MultiReader(bytes.NewReader(mimeBuffer[:n]), teedStream)
+
 	meta := entity.FileMetadata{
 		UploadedAt: time.Now(),
 		CreatedAt: time.Now(), // TODO temp
 		Status: entity.ActiveFileStatus,
 		OriginalName: path.Base(cmd.Path),
 		Path: cmd.Path,
+		Checksum: hex.EncodeToString(hasher.Sum(nil)), // // This will be correct after full upload
+		ChecksumType: "sha256",
+		MIMEType: mimeType.String(),
 	}
 
-	_, err := storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, cmd.Content, cmd.ContentSize, minio.PutObjectOptions{
+	_, err = storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, multiPartStream, cmd.ContentSize, minio.PutObjectOptions{
 		UserMetadata: miniocommon.ConvertToRawMetadata(meta.Pack()),
 	})
 	if err != nil {
