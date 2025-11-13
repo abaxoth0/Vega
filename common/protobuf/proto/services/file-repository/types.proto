@@ -1,0 +1,71 @@
+syntax = "proto3";
+
+package file_repository;
+
+option go_package = "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository";
+
+import "types/file.proto";
+
+message GetFileByPathRequest {
+  string path = 1;
+  string bucket = 2;
+  int32 chunk_size = 3;
+}
+
+message GetFileMetadataByPathRequest {
+  string path = 1;
+  string bucket = 2;
+}
+
+message MkdirRequest {
+  string path = 1;
+  string bucket = 2;
+}
+
+message UploadFileRequest {
+  oneof data {
+    UploadMetadata metadata = 1;
+    bytes chunk = 2;
+  }
+}
+
+message UploadMetadata {
+  common.FileMetadata file_metadata = 1;
+  string path = 2;
+  string bucket = 3;
+}
+
+message UpdateFileContentRequest {
+  oneof data {
+    UpdateContentMetadata metadata = 1;
+    bytes chunk = 2;
+  }
+}
+
+message UpdateContentMetadata {
+  string path = 1;
+  string bucket = 2;
+}
+
+message UpdateFileMetadataRequest {
+  string path = 1;
+  string bucket = 2;
+  common.FileMetadata new_metadata = 3;
+}
+
+message DeleteFilesRequest {
+  repeated string path = 1;
+  string bucket = 2;
+}
+
+message FileChunk {
+  bytes content = 1;
+  int64 chunk_index = 2;
+  int64 total_chunks = 3;
+}
+
+message UploadFileResponse {
+  string file_id = 1;
+  int64  size = 2;
+  string checksum = 3;
+}

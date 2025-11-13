@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package common;
+
+option go_package = "github.com/abaxoth0/Vega/common/protobuf/generated/go/types";
+
+import "google/protobuf/timestamp.proto";
+
+enum FileStatus {
+  FILE_STATUS_ACTIVE = 0;
+  FILE_STATUS_PENDING = 1;
+  FILE_STATUS_ARCHIVED = 2;
+  FILE_STATUS_DELETED = 3;
+}
+
+message FileMetadata {
+  string id = 1;
+  string original_name = 2;
+  string path = 3;
+
+  string encoding = 4;
+  string mime_type = 5;
+  int64 size = 6;
+  string checksum = 7;
+  string checksum_type = 8;
+
+  string owner = 9;
+  string uploaded_by = 10;
+  string permissions = 11;
+
+  string description = 12;
+  repeated string categories = 13;
+  repeated string tags = 14;
+
+  google.protobuf.Timestamp uploaded_at = 15;
+  google.protobuf.Timestamp updated_at = 16;
+  google.protobuf.Timestamp created_at = 17;
+  google.protobuf.Timestamp accessed_at = 18;
+
+  FileStatus status = 19;
+}
