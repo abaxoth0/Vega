@@ -1,4 +1,4 @@
-module github.com/abaxoth0/Vega/grpc
+module github.com/abaxoth0/Vega/common/protobuf
 
 go 1.24.0
 
