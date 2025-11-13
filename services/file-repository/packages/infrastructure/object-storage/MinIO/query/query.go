@@ -117,8 +117,3 @@ func (h *defaultQueryHandler) GetFileMetadataByPath(query *FileApplication.GetFi
 
 	return structuredMetadata, nil
 }
-
-func (h *defaultQueryHandler) SearchFilesByOwner(query *FileApplication.SearchFilesByOwnerQuery) ([]*entity.File, error) {
-	return nil, nil
-}
-

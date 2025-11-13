@@ -8,7 +8,3 @@ type GetFileByPathQuery struct {
 
 	application.CommandQuery
 }
-
-type SearchFilesByOwnerQuery struct {
-	Owner string
-}

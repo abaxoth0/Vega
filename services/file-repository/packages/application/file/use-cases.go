@@ -12,7 +12,6 @@ type UseCases interface {
 type QueryHandler interface {
 	GetFileByPath(query *GetFileByPathQuery) (*entity.FileStream, error)
 	GetFileMetadataByPath(query *GetFileByPathQuery) (*entity.FileMetadata, error)
-	SearchFilesByOwner(query *SearchFilesByOwnerQuery) ([]*entity.File, error)
 }
 
 type CommandHandler interface {
