@@ -3,50 +3,29 @@ package main
 import (
 	"context"
 	"log"
-	"net"
 	"os"
-	"time"
 	fileapplication "vega/packages/application/file"
 	objectstorage "vega/packages/infrastructure/object-storage"
 	storageconnection "vega/packages/infrastructure/object-storage/connection"
+	"vega/packages/presentation/grpc"
 
-	file_repository "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
-	"google.golang.org/grpc"
 )
 
 func main() {
 	testgRPC()
 }
 
-type server struct {
-	file_repository.UnimplementedFileRepositoryServiceServer
-}
-
-func (s *server) HealthCheck(
-	ctx context.Context,
-	req *file_repository.HealthCheckRequest,
-) (*file_repository.HealthCheckResponse, error){
-	log.Printf("Health check called for service: %s", req.GetService())
-	return &file_repository.HealthCheckResponse{
-		Status: "SERVING",
-		Timestamp: time.Now().Format(time.RFC3339),
-	}, nil
-}
-
 func testgRPC() {
-	lis, err := net.Listen("tcp", ":50001")
+	server, err := grpc.NewServer(objectstorage.Driver)
 	if err != nil {
 		panic(err)
 	}
 
-	s := grpc.NewServer()
-	file_repository.RegisterFileRepositoryServiceServer(s, &server{})
+	println("gRPC server started on port 50001")
 
-	log.Println("Server listening on :50001")
-
-	if err := s.Serve(lis); err != nil {
+	if err := server.Start(50001); err != nil {
 		panic(err)
 	}
 }
