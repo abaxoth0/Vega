@@ -9,6 +9,8 @@ import "types/file.proto";
 import "google/protobuf/empty.proto";
 
 service FileRepositoryService {
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+
   // Queries
   rpc GetFileByPath(GetFileByPathRequest) returns (stream FileChunk);
   rpc GetFileMetadataByPath(GetFileMetadataByPathRequest) returns (common.FileMetadata);

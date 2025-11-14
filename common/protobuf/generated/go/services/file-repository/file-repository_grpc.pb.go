@@ -21,6 +21,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	FileRepositoryService_HealthCheck_FullMethodName           = "/file_repository.FileRepositoryService/HealthCheck"
 	FileRepositoryService_GetFileByPath_FullMethodName         = "/file_repository.FileRepositoryService/GetFileByPath"
 	FileRepositoryService_GetFileMetadataByPath_FullMethodName = "/file_repository.FileRepositoryService/GetFileMetadataByPath"
 	FileRepositoryService_Mkdir_FullMethodName                 = "/file_repository.FileRepositoryService/Mkdir"
@@ -34,6 +35,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FileRepositoryServiceClient interface {
+	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 	// Queries
 	GetFileByPath(ctx context.Context, in *GetFileByPathRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FileChunk], error)
 	GetFileMetadataByPath(ctx context.Context, in *GetFileMetadataByPathRequest, opts ...grpc.CallOption) (*types.FileMetadata, error)
@@ -51,6 +53,16 @@ type fileRepositoryServiceClient struct {
 
 func NewFileRepositoryServiceClient(cc grpc.ClientConnInterface) FileRepositoryServiceClient {
 	return &fileRepositoryServiceClient{cc}
+}
+
+func (c *fileRepositoryServiceClient) HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HealthCheckResponse)
+	err := c.cc.Invoke(ctx, FileRepositoryService_HealthCheck_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *fileRepositoryServiceClient) GetFileByPath(ctx context.Context, in *GetFileByPathRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FileChunk], error) {
@@ -142,6 +154,7 @@ func (c *fileRepositoryServiceClient) DeleteFiles(ctx context.Context, in *Delet
 // All implementations must embed UnimplementedFileRepositoryServiceServer
 // for forward compatibility.
 type FileRepositoryServiceServer interface {
+	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 	// Queries
 	GetFileByPath(*GetFileByPathRequest, grpc.ServerStreamingServer[FileChunk]) error
 	GetFileMetadataByPath(context.Context, *GetFileMetadataByPathRequest) (*types.FileMetadata, error)
@@ -161,6 +174,9 @@ type FileRepositoryServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedFileRepositoryServiceServer struct{}
 
+func (UnimplementedFileRepositoryServiceServer) HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HealthCheck not implemented")
+}
 func (UnimplementedFileRepositoryServiceServer) GetFileByPath(*GetFileByPathRequest, grpc.ServerStreamingServer[FileChunk]) error {
 	return status.Errorf(codes.Unimplemented, "method GetFileByPath not implemented")
 }
@@ -201,6 +217,24 @@ func RegisterFileRepositoryServiceServer(s grpc.ServiceRegistrar, srv FileReposi
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&FileRepositoryService_ServiceDesc, srv)
+}
+
+func _FileRepositoryService_HealthCheck_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HealthCheckRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileRepositoryServiceServer).HealthCheck(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FileRepositoryService_HealthCheck_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileRepositoryServiceServer).HealthCheck(ctx, req.(*HealthCheckRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _FileRepositoryService_GetFileByPath_Handler(srv interface{}, stream grpc.ServerStream) error {
@@ -307,6 +341,10 @@ var FileRepositoryService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "file_repository.FileRepositoryService",
 	HandlerType: (*FileRepositoryServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "HealthCheck",
+			Handler:    _FileRepositoryService_HealthCheck_Handler,
+		},
 		{
 			MethodName: "GetFileMetadataByPath",
 			Handler:    _FileRepositoryService_GetFileMetadataByPath_Handler,

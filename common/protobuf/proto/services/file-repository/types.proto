@@ -6,6 +6,15 @@ option go_package = "github.com/abaxoth0/Vega/common/protobuf/generated/go/servi
 
 import "types/file.proto";
 
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  string status = 1;
+  string timestamp = 2;
+}
+
 message GetFileByPathRequest {
   string path = 1;
   string bucket = 2;
