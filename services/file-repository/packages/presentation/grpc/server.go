@@ -13,20 +13,20 @@ import (
 	"google.golang.org/grpc"
 )
 
-type server struct {
+type Server struct {
 	storage objectstorage.ObjectStorageDriver
 	file_repository.UnimplementedFileRepositoryServiceServer
 }
 
-func NewServer(storage objectstorage.ObjectStorageDriver) (*server, error) {
+func NewServer(storage objectstorage.ObjectStorageDriver) (*Server, error) {
 	if storage == nil {
 		return nil, errors.New("storage is nil")
 	}
 
-	return &server{storage: storage}, nil
+	return &Server{storage: storage}, nil
 }
 
-func (s *server) Start(port uint16) error {
+func (s *Server) Start(port uint16) error {
 	listener, err := net.Listen("tcp", ":"+strconv.Itoa(int(port)))
 	if err != nil {
 		return err
@@ -42,7 +42,7 @@ func (s *server) Start(port uint16) error {
 	return nil
 }
 
-func (s *server) HealthCheck(
+func (s *Server) HealthCheck(
 	ctx context.Context,
 	req *file_repository.HealthCheckRequest,
 ) (*file_repository.HealthCheckResponse, error){

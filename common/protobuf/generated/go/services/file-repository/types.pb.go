@@ -674,7 +674,7 @@ type FileChunk struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Content       []byte                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
 	ChunkIndex    int64                  `protobuf:"varint,2,opt,name=chunk_index,json=chunkIndex,proto3" json:"chunk_index,omitempty"`
-	TotalChunks   int64                  `protobuf:"varint,3,opt,name=total_chunks,json=totalChunks,proto3" json:"total_chunks,omitempty"`
+	TotalSize     int64                  `protobuf:"varint,3,opt,name=total_size,json=totalSize,proto3" json:"total_size,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -723,9 +723,9 @@ func (x *FileChunk) GetChunkIndex() int64 {
 	return 0
 }
 
-func (x *FileChunk) GetTotalChunks() int64 {
+func (x *FileChunk) GetTotalSize() int64 {
 	if x != nil {
-		return x.TotalChunks
+		return x.TotalSize
 	}
 	return 0
 }
@@ -832,12 +832,13 @@ const file_services_file_repository_types_proto_rawDesc = "" +
 	"\fnew_metadata\x18\x03 \x01(\v2\x14.common.FileMetadataR\vnewMetadata\"@\n" +
 	"\x12DeleteFilesRequest\x12\x12\n" +
 	"\x04path\x18\x01 \x03(\tR\x04path\x12\x16\n" +
-	"\x06bucket\x18\x02 \x01(\tR\x06bucket\"i\n" +
+	"\x06bucket\x18\x02 \x01(\tR\x06bucket\"e\n" +
 	"\tFileChunk\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\fR\acontent\x12\x1f\n" +
 	"\vchunk_index\x18\x02 \x01(\x03R\n" +
-	"chunkIndex\x12!\n" +
-	"\ftotal_chunks\x18\x03 \x01(\x03R\vtotalChunks\"]\n" +
+	"chunkIndex\x12\x1d\n" +
+	"\n" +
+	"total_size\x18\x03 \x01(\x03R\ttotalSize\"]\n" +
 	"\x12UploadFileResponse\x12\x17\n" +
 	"\afile_id\x18\x01 \x01(\tR\x06fileId\x12\x12\n" +
 	"\x04size\x18\x02 \x01(\x03R\x04size\x12\x1a\n" +

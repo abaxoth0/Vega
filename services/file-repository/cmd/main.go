@@ -3,10 +3,9 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	fileapplication "vega/packages/application/file"
-	objectstorage "vega/packages/infrastructure/object-storage"
-	storageconnection "vega/packages/infrastructure/object-storage/connection"
+	ObjectStorage "vega/packages/infrastructure/object-storage"
+	StorageConnection "vega/packages/infrastructure/object-storage/connection"
 	"vega/packages/presentation/grpc"
 
 	"github.com/minio/minio-go/v7"
@@ -18,7 +17,19 @@ func main() {
 }
 
 func testgRPC() {
-	server, err := grpc.NewServer(objectstorage.Driver)
+	err := ObjectStorage.Driver.Connect(&StorageConnection.Config{
+		URL: "localhost:9000",
+		Login: "minioadmin",
+		Password: "minioadmin",
+		Token: "",
+		Secure: false,
+	})
+	if err != nil {
+		panic(err)
+	}
+	defer ObjectStorage.Driver.Disconnect()
+
+	server, err := grpc.NewServer(ObjectStorage.Driver)
 	if err != nil {
 		panic(err)
 	}
@@ -31,7 +42,7 @@ func testgRPC() {
 }
 
 func testStorage() {
-	err := objectstorage.Driver.Connect(&storageconnection.Config{
+	err := ObjectStorage.Driver.Connect(&StorageConnection.Config{
 		URL: "localhost:9000",
 		Login: "minioadmin",
 		Password: "minioadmin",
@@ -42,7 +53,7 @@ func testStorage() {
 		panic(err)
 	}
 
-	file, err := objectstorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
+	file, err := ObjectStorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
 		Path: "/my-new-file.txt",
 		Bucket: "test-bucket",
 	})
@@ -55,7 +66,7 @@ func testStorage() {
 	// }
 	// println(string(data))
 
-	e := objectstorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
+	e := ObjectStorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
 		FileMeta: nil,
 		Content: file.Content,
 		ContentSize: file.Size,
@@ -107,7 +118,7 @@ func test() {
 	log.Println("Successfully connected to MinIO")
 
 	// 1. Create a bucket
-	bucketName := "my-test-bucket"
+	bucketName := "test-bucket"
 	err = minioClient.MakeBucket(ctx, bucketName, minio.MakeBucketOptions{})
 	if err != nil {
 		// Check if bucket already exists
@@ -122,8 +133,8 @@ func test() {
 	}
 
 	// 2. Upload a file
-	objectName := "test-file.txt"
-	filePath := "./test-file.txt"
+	objectName := "war-and-peace.txt"
+	filePath := "./war-and-peace.txt"
 
 	// Upload the file
 	info, err := minioClient.FPutObject(ctx, bucketName, objectName, filePath, minio.PutObjectOptions{
@@ -147,19 +158,19 @@ func test() {
 	}
 
 	// 4. Download the file
-	downloadPath := "./downloaded-file.txt"
-	err = minioClient.FGetObject(ctx, bucketName, objectName, downloadPath, minio.GetObjectOptions{})
-	if err != nil {
-		log.Fatalf("Failed to download file: %v", err)
-	}
-	log.Printf("Successfully downloaded file to: %s\n", downloadPath)
+	// downloadPath := "./downloaded-file.txt"
+	// err = minioClient.FGetObject(ctx, bucketName, objectName, downloadPath, minio.GetObjectOptions{})
+	// if err != nil {
+	// 	log.Fatalf("Failed to download file: %v", err)
+	// }
+	// log.Printf("Successfully downloaded file to: %s\n", downloadPath)
 
 	// 5. Check if file exists and read its content
-	content, err := os.ReadFile(downloadPath)
-	if err != nil {
-		log.Fatalf("Failed to read downloaded file: %v", err)
-	}
-	log.Printf("File content: %s\n", string(content))
+	// content, err := os.ReadFile(downloadPath)
+	// if err != nil {
+	// 	log.Fatalf("Failed to read downloaded file: %v", err)
+	// }
+	// log.Printf("File content: %s\n", string(content))
 
 	// 6. Remove the object (optional)
 	// err = minioClient.RemoveObject(ctx, bucketName, objectName, minio.RemoveObjectOptions{})

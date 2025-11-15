@@ -8,22 +8,22 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *server) Mkdir(context.Context, *file_repository.MkdirRequest) (*emptypb.Empty, error) {
+func (s *Server) Mkdir(context.Context, *file_repository.MkdirRequest) (*emptypb.Empty, error) {
 	panic("Mkdir() is not implemented")
 }
 
-func (s *server) UploadFile(grpc.ClientStreamingServer[file_repository.UploadFileRequest, file_repository.UploadFileResponse]) error {
+func (s *Server) UploadFile(grpc.ClientStreamingServer[file_repository.UploadFileRequest, file_repository.UploadFileResponse]) error {
 	panic("UploadFile() is not implemented")
 }
 
-func (s *server) UpdateFileContent(grpc.ClientStreamingServer[file_repository.UpdateFileContentRequest, emptypb.Empty]) error {
+func (s *Server) UpdateFileContent(grpc.ClientStreamingServer[file_repository.UpdateFileContentRequest, emptypb.Empty]) error {
 	panic("UpdateFileContent() is not implemented")
 }
 
-func (s *server) UpdateFileMetadata(context.Context, *file_repository.UpdateFileMetadataRequest) (*emptypb.Empty, error) {
+func (s *Server) UpdateFileMetadata(context.Context, *file_repository.UpdateFileMetadataRequest) (*emptypb.Empty, error) {
 	panic("UpdateFileMetadata() is not implemented")
 }
 
-func (s *server) DeleteFiles(context.Context, *file_repository.DeleteFilesRequest) (*emptypb.Empty, error) {
+func (s *Server) DeleteFiles(context.Context, *file_repository.DeleteFilesRequest) (*emptypb.Empty, error) {
 	panic("DeleteFiles() is not implemented")
 }
