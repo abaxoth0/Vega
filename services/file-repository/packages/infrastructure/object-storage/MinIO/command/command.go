@@ -31,7 +31,9 @@ type defaultCommandHandler struct {
 
 var storage = MinIOConnection.Manager
 
-func (h *defaultCommandHandler) preprocessCommand(commandQuery *application.CommandQuery, path string) error {
+func (h *defaultCommandHandler) preprocessTargetedCommandQuery(
+	commandQuery *application.CommandQuery, path string,
+) error {
 	if !commandQuery.IsInit() {
 		application.InitDefaultCommandQuery(commandQuery)
 	}
@@ -41,8 +43,20 @@ func (h *defaultCommandHandler) preprocessCommand(commandQuery *application.Comm
 	return nil
 }
 
+func (h *defaultCommandHandler) preprocessCommandQuery(
+	commandQuery *application.CommandQuery,
+) (context.Context, context.CancelFunc) {
+	if !commandQuery.IsInit() {
+		application.InitDefaultCommandQuery(commandQuery)
+	}
+
+	ctx, cancel := context.WithTimeout(commandQuery.Context, commandQuery.ContextTimeout)
+
+	return ctx, cancel
+}
+
 func (h *defaultCommandHandler) Mkdir(cmd *FileApplication.MkdirCommand) error {
-	if err := h.preprocessCommand(&cmd.CommandQuery, cmd.Path); err != nil {
+	if err := h.preprocessTargetedCommandQuery(&cmd.CommandQuery, cmd.Path); err != nil {
 		return err
 	}
 	if ok := FileApplication.IsDirectory(cmd.Path); !ok {
@@ -62,7 +76,7 @@ func (h *defaultCommandHandler) Mkdir(cmd *FileApplication.MkdirCommand) error {
 }
 
 func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileCommand) error {
-	if err := h.preprocessCommand(&cmd.CommandQuery, cmd.Path); err != nil {
+	if err := h.preprocessTargetedCommandQuery(&cmd.CommandQuery, cmd.Path); err != nil {
 		return err
 	}
 	if cmd.ContentSize <= 0 {
@@ -115,7 +129,7 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 }
 
 func (h *defaultCommandHandler) UpdateFileMetadata(cmd *FileApplication.UpdateFileMetadataCommand) error {
-	if err := h.preprocessCommand(&cmd.CommandQuery, cmd.Path); err != nil {
+	if err := h.preprocessTargetedCommandQuery(&cmd.CommandQuery, cmd.Path); err != nil {
 		return err
 	}
 
@@ -170,7 +184,7 @@ func (h *defaultCommandHandler) fullReplace(ctx context.Context, bucket string, 
 }
 
 func (h *defaultCommandHandler) UpdateFileContent(cmd *FileApplication.UpdateFileContentCommand) error {
-	if err := h.preprocessCommand(&cmd.CommandQuery, cmd.Path); err != nil {
+	if err := h.preprocessTargetedCommandQuery(&cmd.CommandQuery, cmd.Path); err != nil {
 		return err
 	}
 
@@ -190,7 +204,10 @@ func (h *defaultCommandHandler) UpdateFileContent(cmd *FileApplication.UpdateFil
 // possibility for users to decide - should file existance be checked before deletion or not? But this can be used
 // for possible attacks, like DoS... so - does it even worth this? I don't know, i can't really imagine situations
 // when this functional will be really needed... So maybe leave it as it is works now? Again - i don't know...
+//
+// TODO (FEAT): Implement recursive deletion for directories
 func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesCommand) error {
+
 	if !cmd.CommandQuery.IsInit() {
 		application.InitDefaultCommandQuery(&cmd.CommandQuery)
 	}
@@ -198,10 +215,6 @@ func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesComm
 	for _, path := range cmd.Paths {
 		if err := FileApplication.ValidatePathFormat(path); err != nil {
 			return err
-		}
-		// TODO (FEAT): Implement recursive deletion for directories
-		if FileApplication.IsDirectory(path) {
-			return errors.New("can't delete directory: " + path)
 		}
 	}
 
@@ -238,6 +251,30 @@ func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesComm
 
 	if len(errors) > 0 {
 		return fmt.Errorf("deletion errors: %s", strings.Join(errors, ";"))
+	}
+
+	return nil
+}
+
+
+
+func (h *defaultCommandHandler) MakeBucket(cmd *FileApplication.BucketCommand) error {
+	ctx, cancel := h.preprocessCommandQuery(&cmd.CommandQuery)
+	defer cancel()
+
+	if err := storage.Client.MakeBucket(ctx, cmd.Name, minio.MakeBucketOptions{}); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *defaultCommandHandler) DeleteBucket(cmd *FileApplication.BucketCommand) error {
+	ctx, cancel := h.preprocessCommandQuery(&cmd.CommandQuery)
+	defer cancel()
+
+	if err := storage.Client.RemoveBucket(ctx, cmd.Name); err != nil {
+		return err
 	}
 
 	return nil

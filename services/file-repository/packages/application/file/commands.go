@@ -47,3 +47,9 @@ type DeleteFilesCommand struct {
 
 	application.CommandQuery
 }
+
+type BucketCommand struct {
+	Name string
+
+	application.CommandQuery
+}
