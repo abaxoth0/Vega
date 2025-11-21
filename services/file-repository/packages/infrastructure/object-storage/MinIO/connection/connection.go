@@ -1,6 +1,8 @@
 package minioconnection
 
 import (
+	"context"
+	"time"
 	StorageConnection "vega/packages/infrastructure/object-storage/connection"
 
 	"github.com/minio/minio-go/v7"
@@ -41,5 +43,18 @@ func (m *defaultConnectionManager) Connect(cfg *StorageConnection.Config) error 
 // which handles connection pooling and cleanup automatically, so there no need in this method.
 // P.S. Furthermore MinIO client has no methods that even makes manual disconnection posible, so there no choice.
 func (m *defaultConnectionManager) Disconnect() error {
+	m.status = StorageConnection.Disconnected
+	return nil
+}
+
+func (m *defaultConnectionManager) Ping(timeout time.Duration) error {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	// There are no built-in Ping function
+	_, err := m.Client.BucketExists(ctx, "vega--health-check")
+	if err != nil {
+		return err
+	}
 	return nil
 }
