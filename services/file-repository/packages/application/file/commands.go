@@ -48,8 +48,15 @@ type DeleteFilesCommand struct {
 	application.CommandQuery
 }
 
-type BucketCommand struct {
-	Name string
+type MakeBucketCommand struct {
+	Name  string
+
+	application.CommandQuery
+}
+
+type DeleteBucketCommand struct {
+	Name  string
+	Force bool
 
 	application.CommandQuery
 }

@@ -20,6 +20,6 @@ type CommandHandler interface {
 	UpdateFileContent(cmd *UpdateFileContentCommand) error
 	UpdateFileMetadata(cmd *UpdateFileMetadataCommand) error
 	DeleteFiles(cmd *DeleteFilesCommand) error
-	MakeBucket(cmd *BucketCommand) error
-	DeleteBucket(cmd *BucketCommand) error
+	MakeBucket(cmd *MakeBucketCommand) error
+	DeleteBucket(cmd *DeleteBucketCommand) error
 }

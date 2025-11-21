@@ -86,6 +86,9 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		// TODO (FEAT): Allow upload archives as directories (using flag in cmd?)
 		return errors.New("Can't upload file as directory")
 	}
+	if cmd.Content == nil {
+		cmd.Content = bytes.NewReader([]byte{})
+	}
 
 	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
 	defer cancel()
@@ -258,7 +261,7 @@ func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesComm
 
 
 
-func (h *defaultCommandHandler) MakeBucket(cmd *FileApplication.BucketCommand) error {
+func (h *defaultCommandHandler) MakeBucket(cmd *FileApplication.MakeBucketCommand) error {
 	ctx, cancel := h.preprocessCommandQuery(&cmd.CommandQuery)
 	defer cancel()
 
@@ -269,11 +272,14 @@ func (h *defaultCommandHandler) MakeBucket(cmd *FileApplication.BucketCommand) e
 	return nil
 }
 
-func (h *defaultCommandHandler) DeleteBucket(cmd *FileApplication.BucketCommand) error {
+func (h *defaultCommandHandler) DeleteBucket(cmd *FileApplication.DeleteBucketCommand) error {
 	ctx, cancel := h.preprocessCommandQuery(&cmd.CommandQuery)
 	defer cancel()
 
-	if err := storage.Client.RemoveBucket(ctx, cmd.Name); err != nil {
+	err := storage.Client.RemoveBucketWithOptions(ctx, cmd.Name, minio.RemoveBucketOptions{
+		ForceDelete: cmd.Force,
+	})
+	if err != nil {
 		return err
 	}
 
