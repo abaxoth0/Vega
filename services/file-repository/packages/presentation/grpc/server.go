@@ -45,10 +45,10 @@ func (s *Server) Start(port uint16) error {
 func (s *Server) HealthCheck(
 	ctx context.Context,
 	req *file_repository.HealthCheckRequest,
-) (*file_repository.HealthCheckResponse, error){
+) (*file_repository.HealthCheckResponse, error) {
 	log.Printf("Health check called for service: %s", req.GetService())
 	return &file_repository.HealthCheckResponse{
-		Status: "SERVING",
+		Status:    "SERVING",
 		Timestamp: time.Now().Format(time.RFC3339),
 	}, nil
 }

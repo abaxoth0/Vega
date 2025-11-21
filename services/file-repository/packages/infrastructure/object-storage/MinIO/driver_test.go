@@ -11,11 +11,11 @@ import (
 
 func connect(driver *Driver) error {
 	return driver.Connect(&StorageConnection.Config{
-		URL: "localhost:9000",
-		Login: "minioadmin",
+		URL:      "localhost:9000",
+		Login:    "minioadmin",
 		Password: "minioadmin",
-		Token: "",
-		Secure: false,
+		Token:    "",
+		Secure:   false,
 	})
 }
 
@@ -59,7 +59,7 @@ func TestObjectStorageDriver(t *testing.T) {
 			t.Fatalf("Connection failed")
 		}
 
-		bucketName := "vega--auto-test-"+strconv.FormatInt(time.Now().UnixMilli(), 10)
+		bucketName := "vega--auto-test-" + strconv.FormatInt(time.Now().UnixMilli(), 10)
 		t.Log("Test bucket name: " + bucketName)
 
 		t.Log("Testing Driver.MakeBucket()...")
@@ -72,10 +72,10 @@ func TestObjectStorageDriver(t *testing.T) {
 		t.Log("Testing Driver.MakeBucket(): OK")
 
 		type testInputs struct {
-			path 	string
+			path    string
 			invalid bool
-			empty	bool
-			size	int64
+			empty   bool
+			size    int64
 		}
 
 		pathOverflow := new(strings.Builder)
@@ -87,33 +87,33 @@ func TestObjectStorageDriver(t *testing.T) {
 			pathOverflow.WriteByte('a')
 
 			segmentOverflow.WriteByte('a')
-			if i % 300 == 0 {
+			if i%300 == 0 {
 				segmentOverflow.WriteByte('/')
 			}
 		}
 
 		commonInvalidInputs := []testInputs{
-			{ path: "", invalid: true },
-			{ path: "/", invalid: true },
-			{ path: "//", invalid: true },
-			{ path: "///", invalid: true },
-			{ path: ".", invalid: true },
-			{ path: ".", invalid: true },
-			{ path: "./", invalid: true },
-			{ path: pathOverflow.String(), invalid: true },
-			{ path: segmentOverflow.String(), invalid: true },
+			{path: "", invalid: true},
+			{path: "/", invalid: true},
+			{path: "//", invalid: true},
+			{path: "///", invalid: true},
+			{path: ".", invalid: true},
+			{path: ".", invalid: true},
+			{path: "./", invalid: true},
+			{path: pathOverflow.String(), invalid: true},
+			{path: segmentOverflow.String(), invalid: true},
 		}
 
 		dirInputs := append(commonInvalidInputs, []testInputs{
-			{ path: "/direcotry/"},
-			{ path: "/direcotry", invalid: true },
+			{path: "/direcotry/"},
+			{path: "/direcotry", invalid: true},
 		}...)
 
 		t.Log("Testing Driver.Mkdir()...")
 		for _, input := range dirInputs {
 			err = driver.Mkdir(&FileApplication.MkdirCommand{
 				Bucket: bucketName,
-				Path: input.path,
+				Path:   input.path,
 			})
 			if (err != nil && input.invalid) || (err == nil && !input.invalid) {
 				continue
@@ -126,7 +126,7 @@ func TestObjectStorageDriver(t *testing.T) {
 		for _, input := range dirInputs {
 			err = driver.DeleteFiles(&FileApplication.DeleteFilesCommand{
 				Bucket: bucketName,
-				Paths: []string{input.path},
+				Paths:  []string{input.path},
 			})
 			// Allow invalid inputs to be used, but ignore the result.
 			// Just to see will it cause panic or some unexpected behaviour or not.
@@ -154,7 +154,7 @@ func TestObjectStorageDriver(t *testing.T) {
 			paths = append(paths, input.path)
 			cmd := FileApplication.UploadFileCommand{
 				Bucket: bucketName,
-				Path: input.path,
+				Path:   input.path,
 			}
 			if !input.empty {
 				cmd.Content = strings.NewReader(fileContent)
@@ -180,7 +180,7 @@ func TestObjectStorageDriver(t *testing.T) {
 
 		t.Log("Testing Driver.DeleteBucket()...")
 		err = driver.DeleteBucket(&FileApplication.DeleteBucketCommand{
-			Name: bucketName,
+			Name:  bucketName,
 			Force: true,
 		})
 		if err != nil {
@@ -189,4 +189,3 @@ func TestObjectStorageDriver(t *testing.T) {
 		t.Log("Testing Driver.DeleteBucket(): OK")
 	})
 }
-

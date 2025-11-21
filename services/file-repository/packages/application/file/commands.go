@@ -9,8 +9,8 @@ import (
 )
 
 type MkdirCommand struct {
-	Bucket 	string
-	Path 	string
+	Bucket string
+	Path   string
 
 	application.CommandQuery
 }
@@ -49,7 +49,7 @@ type DeleteFilesCommand struct {
 }
 
 type MakeBucketCommand struct {
-	Name  string
+	Name string
 
 	application.CommandQuery
 }

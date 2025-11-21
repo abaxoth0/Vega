@@ -48,7 +48,7 @@ func (s FileStatus) String() string {
 type FileMetadata struct {
 	ID           string
 	OriginalName string
-	Path  		 string
+	Path         string
 
 	Encoding     string
 	MIMEType     string
@@ -91,7 +91,7 @@ func NewFileMetadata(meta structs.Meta) (*FileMetadata, error) {
 
 	fileMeta.Description = meta["description"].(string)
 	fileMeta.Categories = meta["categories"].([]string)
-	fileMeta.Tags = meta["tags"].([]string)  // TODO: refactor this from []string to map[string]string?
+	fileMeta.Tags = meta["tags"].([]string) // TODO: refactor this from []string to map[string]string?
 
 	fileMeta.Status = meta["status"].(FileStatus)
 	if err := fileMeta.Status.Validate(); err != nil {

@@ -14,10 +14,10 @@ import (
 func (s *Server) GetFileByPath(
 	req *file_repository.GetFileByPathRequest,
 	stream grpc.ServerStreamingServer[file_repository.FileChunk],
-) (error){
+) error {
 	fileStream, err := s.storage.GetFileByPath(&FileApplication.GetFileByPathQuery{
 		Bucket: req.GetBucket(),
-		Path: req.GetPath(),
+		Path:   req.GetPath(),
 	})
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func (s *Server) GetFileByPath(
 	}
 
 	buf := make([]byte, chunkSize)
-	var chunkIndex 	int64
+	var chunkIndex int64
 	var totalChunks int64
 
 	if fileStream.Size == 0 {
@@ -56,9 +56,9 @@ func (s *Server) GetFileByPath(
 		}
 
 		chunk := &file_repository.FileChunk{
-			Content: buf[:n],
+			Content:    buf[:n],
 			ChunkIndex: chunkIndex,
-			TotalSize: fileStream.Size,
+			TotalSize:  fileStream.Size,
 		}
 
 		if err := stream.Send(chunk); err != nil {

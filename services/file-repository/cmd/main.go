@@ -18,11 +18,11 @@ func main() {
 
 func testgRPC() {
 	err := ObjectStorage.Driver.Connect(&StorageConnection.Config{
-		URL: "localhost:9000",
-		Login: "minioadmin",
+		URL:      "localhost:9000",
+		Login:    "minioadmin",
 		Password: "minioadmin",
-		Token: "",
-		Secure: false,
+		Token:    "",
+		Secure:   false,
 	})
 	if err != nil {
 		panic(err)
@@ -43,18 +43,18 @@ func testgRPC() {
 
 func testStorage() {
 	err := ObjectStorage.Driver.Connect(&StorageConnection.Config{
-		URL: "localhost:9000",
-		Login: "minioadmin",
+		URL:      "localhost:9000",
+		Login:    "minioadmin",
 		Password: "minioadmin",
-		Token: "",
-		Secure: false,
+		Token:    "",
+		Secure:   false,
 	})
 	if err != nil {
 		panic(err)
 	}
 
 	file, err := ObjectStorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
-		Path: "/my-new-file.txt",
+		Path:   "/my-new-file.txt",
 		Bucket: "test-bucket",
 	})
 	if err != nil {
@@ -67,11 +67,11 @@ func testStorage() {
 	// println(string(data))
 
 	e := ObjectStorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
-		FileMeta: nil,
-		Content: file.Content,
+		FileMeta:    nil,
+		Content:     file.Content,
 		ContentSize: file.Size,
-		Path: "/mime-test.txt",
-		Bucket: "test-bucket",
+		Path:        "/mime-test.txt",
+		Bucket:      "test-bucket",
 	})
 	// e := objectstorage.Driver.DeleteFiles(&fileapplication.DeleteFilesCommand{
 	// 	Paths: []string{"/test1.txt", "/test2.txt", "/test4.txt"},
@@ -82,7 +82,6 @@ func testStorage() {
 	// 	Bucket: "test-bucket",
 	// 	NewContent: []byte("full replace upd test"),
 	// })
-
 
 	// meta, e := objectstorage.Driver.GetFileMetadataByPath(&fileapplication.GetFileByPathQuery{
 	// 	Path: "/my-new-file.txt",

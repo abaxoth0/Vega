@@ -18,7 +18,6 @@ var Handler FileApplication.QueryHandler = new(defaultQueryHandler)
 var storage = MinIOConnection.Manager
 
 type defaultQueryHandler struct {
-
 }
 
 func (h *defaultQueryHandler) preprocessQuery(commandQuery *application.CommandQuery, path string) error {
@@ -60,9 +59,9 @@ func (h *defaultQueryHandler) GetFileByPath(query *FileApplication.GetFileByPath
 
 	return &entity.FileStream{
 		Content: object,
-		Size: stat.Size,
+		Size:    stat.Size,
 		Context: ctx,
-		Cancel: cancel,
+		Cancel:  cancel,
 	}, nil
 }
 

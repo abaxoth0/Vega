@@ -10,7 +10,7 @@ const (
 )
 
 var statusMap map[Status]string = map[Status]string{
-	Connected: 	  "connected",
+	Connected:    "connected",
 	Disconnected: "disconnected",
 }
 

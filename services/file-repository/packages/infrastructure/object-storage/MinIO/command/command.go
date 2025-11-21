@@ -66,8 +66,7 @@ func (h *defaultCommandHandler) Mkdir(cmd *FileApplication.MkdirCommand) error {
 	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
 	defer cancel()
 
-	_, err := storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, nil, 0, minio.PutObjectOptions{
-	})
+	_, err := storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, nil, 0, minio.PutObjectOptions{})
 	if err != nil {
 		return err
 	}
@@ -111,14 +110,14 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 	multiPartStream := io.MultiReader(bytes.NewReader(mimeBuffer[:n]), teedStream)
 
 	meta := entity.FileMetadata{
-		UploadedAt: time.Now(),
-		CreatedAt: time.Now(), // TODO temp
-		Status: entity.ActiveFileStatus,
+		UploadedAt:   time.Now(),
+		CreatedAt:    time.Now(), // TODO temp
+		Status:       entity.ActiveFileStatus,
 		OriginalName: path.Base(cmd.Path),
-		Path: cmd.Path,
-		Checksum: hex.EncodeToString(hasher.Sum(nil)), // // This will be correct after full upload
+		Path:         cmd.Path,
+		Checksum:     hex.EncodeToString(hasher.Sum(nil)), // // This will be correct after full upload
 		ChecksumType: "sha256",
-		MIMEType: mimeType.String(),
+		MIMEType:     mimeType.String(),
 	}
 
 	_, err = storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, multiPartStream, cmd.ContentSize, minio.PutObjectOptions{
@@ -162,9 +161,9 @@ func (h *defaultCommandHandler) copyWithNewMetadata(
 		Object: path,
 	}
 	dest := minio.CopyDestOptions{
-		Bucket: bucket,
-		Object: path,
-		UserMetadata: miniocommon.ConvertToRawMetadata(newMetadata),
+		Bucket:          bucket,
+		Object:          path,
+		UserMetadata:    miniocommon.ConvertToRawMetadata(newMetadata),
 		ReplaceMetadata: true,
 	}
 
@@ -258,8 +257,6 @@ func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesComm
 
 	return nil
 }
-
-
 
 func (h *defaultCommandHandler) MakeBucket(cmd *FileApplication.MakeBucketCommand) error {
 	ctx, cancel := h.preprocessCommandQuery(&cmd.CommandQuery)
