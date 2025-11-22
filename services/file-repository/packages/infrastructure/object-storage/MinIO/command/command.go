@@ -108,16 +108,30 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 	mimeType := mimetype.Detect(mimeBuffer[:n])
 
 	multiPartStream := io.MultiReader(bytes.NewReader(mimeBuffer[:n]), teedStream)
+	now := time.Now()
 
 	meta := entity.FileMetadata{
-		UploadedAt:   time.Now(),
-		CreatedAt:    time.Now(), // TODO temp
-		Status:       entity.ActiveFileStatus,
+		ID: 		  cmd.FileMeta.ID,
 		OriginalName: path.Base(cmd.Path),
 		Path:         cmd.Path,
-		Checksum:     hex.EncodeToString(hasher.Sum(nil)), // // This will be correct after full upload
-		ChecksumType: "sha256",
+
+		Encoding: 	  cmd.FileMeta.Encoding,
 		MIMEType:     mimeType.String(),
+		Checksum:     hex.EncodeToString(hasher.Sum(nil)),
+		ChecksumType: "sha256",
+
+		Owner: 		 cmd.FileMeta.Owner,
+		UploadedBy:  cmd.FileMeta.UploadedBy,
+		Permissions: cmd.FileMeta.Permissions,
+
+		Description: cmd.FileMeta.Description,
+		Categories:  cmd.FileMeta.Categories,
+		Tags: 		 cmd.FileMeta.Tags,
+
+		UploadedAt: now,
+		CreatedAt:  now, // TODO temp
+
+		Status: entity.ActiveFileStatus,
 	}
 
 	_, err = storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, multiPartStream, cmd.ContentSize, minio.PutObjectOptions{
