@@ -5,9 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"slices"
+	"strconv"
+	"strings"
 	"time"
 
+	errs "github.com/abaxoth0/Vega/libs/go/packages/erorrs"
 	"github.com/abaxoth0/Vega/libs/go/packages/structs"
 )
 
@@ -45,6 +49,225 @@ func (s FileStatus) String() string {
 	return string(s)
 }
 
+type FilePermissionGroup uint16
+
+const (
+	FilePermissionGroupSize int = 3
+	// Amount of FilePermissionGroup in FilePermissions
+	FilePermissionGroupsAmount int = 3
+)
+
+const (
+	ReadFilePermission FilePermissionGroup = 1 << iota
+	UpdateFilePermission
+	DeleteFilePermission
+)
+
+const (
+	ReadFilePermissionChar 	 rune = 'r'
+	UpdateFilePermissionChar rune = 'u'
+	DeleteFilePermissionChar rune = 'd'
+	NoFilePermissionChar 	 rune = '-'
+)
+
+var permissionMap = map[FilePermissionGroup]rune{
+	ReadFilePermission:   ReadFilePermissionChar,
+	UpdateFilePermission: UpdateFilePermissionChar,
+	DeleteFilePermission: DeleteFilePermissionChar,
+}
+
+func (p FilePermissionGroup) String() string {
+	str := []rune{}
+
+	p |= 1 << (FilePermissionGroupSize + 1)
+	for i := 1; i <= FilePermissionGroupSize; i++ {
+		if p & 1 != 0 {
+			permission := FilePermissionGroup(1 << (FilePermissionGroupSize-i))
+			char, ok := permissionMap[permission]
+			if !ok {
+				panic(fmt.Sprintf(
+					"invalid permission char \"%s\" for 0b%s",
+					string(char), strconv.FormatInt(int64(permission), 2),
+				))
+			}
+			str = append(str, char)
+		} else {
+			str = append(str, NoFilePermissionChar)
+		}
+		p >>= 1
+	}
+
+	slices.Reverse(str)
+
+	return string(str)
+}
+
+// File permissions works similar to Linux file permissions.
+// And mechanism of how it works can be extended indefinitely, proof:
+//
+// Consider a set of distinct powers of two:
+//
+//  { 2^0, 2^1, 2^2, …, 2^(N−1) }
+//
+// In binary, each number has a single 1 in a unique position. For example:
+//
+//  1 = 2^0 = 001
+//  2 = 2^1 = 010
+//  4 = 2^2 = 100
+//  ...and so on
+//
+// Any subset of these numbers corresponds to a binary number where the 1-bits
+// indicate which elements are included. For instance:
+//
+//  { 1, 4 } -> 1 + 4 = 5 (0101)
+//
+// Because each power of two occupies a unique bit position, every subset produces a unique binary number.
+// Hence, all subset sums are distinct.
+type FilePermissions uint32
+
+func NewFilePermissions(owner, shared, other FilePermissionGroup) FilePermissions {
+	offset := FilePermissionGroup(FilePermissionGroupSize)
+	// All bits must be aligned in groups by 3, so to keep this alignment need to add special bit,
+	// which will come right after the most left block, by doing so, number will have this format:
+	//
+	// 0b1<owner-group><shared-group><other-group>
+	//   ↑
+	//   alignment bit
+	return FilePermissions((((1 << offset*(offset-1)) | (owner << offset) | shared) << offset) | other)
+}
+
+var emptyFilePermissions = NewFilePermissions(0,0,0)
+
+func (p FilePermissions) IsEmpty() bool {
+	return p == emptyFilePermissions
+}
+
+// Binary number wich is equal to N ones that comes sequentially, N is FilePermissionGroupSize.
+// e.g. if FilePermissionGroupSize = 3, then this number will be equal to 0b111.
+var filePermissionsGroupBits FilePermissions = func() FilePermissions {
+	var r FilePermissions = 1
+	for i := 1; i < FilePermissionGroupSize; i++ {
+		r |= (1 << i)
+	}
+	return r
+}()
+
+const (
+	otherGroupRightOffset int = FilePermissionGroupSize * iota
+	sharedGroupRightOffset
+	ownerGroupRightOffset
+)
+
+func (p FilePermissions) getGroupWithRightOffset(offset int) FilePermissionGroup {
+	return FilePermissionGroup(p >> offset & filePermissionsGroupBits)
+}
+
+func (p FilePermissions) GetOwnerPermissions() FilePermissionGroup {
+	return p.getGroupWithRightOffset(ownerGroupRightOffset)
+}
+
+func (p FilePermissions) GetSharedPermissions() FilePermissionGroup {
+	return p.getGroupWithRightOffset(sharedGroupRightOffset)
+}
+
+func (p FilePermissions) GetOtherPermissions() FilePermissionGroup {
+	return p.getGroupWithRightOffset(otherGroupRightOffset)
+}
+
+func (p FilePermissions) String() string {
+	str := []string{}
+
+	for i := range FilePermissionGroupsAmount {
+		str = append(str, p.getGroupWithRightOffset(FilePermissionGroupSize*i).String())
+	}
+
+	slices.Reverse(str)
+
+	return strings.Join(str, "")
+}
+
+var ErrInvalidFilePermissionGroupLength = errors.New("invalid file permission group length")
+var ErrInvalidFilePermissionGroupFormat = errors.New("invalid file permission group format")
+
+func ParseFilePermissionGroup(g string) (FilePermissionGroup, error) {
+	if len(g) != FilePermissionGroupSize {
+		return 0, ErrInvalidFilePermissionGroupLength
+	}
+
+	group := []rune(g)
+	slices.Reverse(group)
+
+	fpGroup := FilePermissionGroup(0)
+
+	// TODO probably this should be optimised
+
+	read   := rune(group[2])
+	update := rune(group[1])
+	del    := rune(group[0])
+
+	if read != ReadFilePermissionChar && read != NoFilePermissionChar {
+		return 0, ErrInvalidFilePermissionGroupFormat
+	}
+	if update != UpdateFilePermissionChar && update != NoFilePermissionChar {
+		return 0, ErrInvalidFilePermissionGroupFormat
+	}
+	if del != DeleteFilePermissionChar && del != NoFilePermissionChar {
+		return 0, ErrInvalidFilePermissionGroupFormat
+	}
+
+	if read == ReadFilePermissionChar {
+		fpGroup |= ReadFilePermission
+	}
+	if update == UpdateFilePermissionChar {
+		fpGroup |= UpdateFilePermission
+	}
+	if del == DeleteFilePermissionChar {
+		fpGroup |= DeleteFilePermission
+	}
+
+	return fpGroup, nil
+}
+
+var ErrInvalidFilePermissionsLength = errors.New("invalid file permissions length")
+
+func ParseFilePermissions(permissions string) (FilePermissions, error) {
+	if len(permissions) != FilePermissionGroupsAmount*FilePermissionGroupSize {
+		return 0, ErrInvalidFilePermissionsLength
+	}
+
+	rawGroups := make([]string, FilePermissionGroupsAmount)
+	rawGroupIdx := 0
+	offset := 0
+
+	for i := range permissions {
+		if (i+1)%FilePermissionGroupSize == 0 {
+			rawGroups[rawGroupIdx] = permissions[offset:FilePermissionGroupSize*(rawGroupIdx+1)]
+			offset += FilePermissionGroupSize
+			rawGroupIdx++
+		}
+	}
+
+	if rawGroupIdx != FilePermissionGroupsAmount {
+		log.Printf(
+			"[ ERROR ] Mistmatch of file permissions groups amount (%d) and amount of parsed groups (%d)\n",
+			FilePermissionGroupsAmount, rawGroupIdx+1,
+		)
+		return 0, errs.StatusInternalServerError
+	}
+
+	groups := []FilePermissionGroup{}
+
+	for _, rawGroup := range rawGroups {
+		group, err := ParseFilePermissionGroup(rawGroup)
+		if err != nil {
+			return 0, err
+		}
+		groups = append(groups, group)
+	}
+
+	return NewFilePermissions(groups[0], groups[1], groups[2]), nil
+}
+
 type FileMetadata struct {
 	ID           string
 	OriginalName string
@@ -58,7 +281,7 @@ type FileMetadata struct {
 
 	Owner       string
 	UploadedBy  string
-	Permissions string
+	Permissions FilePermissions
 
 	Description string
 	Categories  []string
@@ -87,7 +310,7 @@ func NewFileMetadata(meta structs.Meta) (*FileMetadata, error) {
 
 	fileMeta.Owner = meta["owner"].(string)
 	fileMeta.UploadedBy = meta["uploaded-by"].(string)
-	fileMeta.Permissions = meta["permissions"].(string)
+	fileMeta.Permissions = meta["permissions"].(FilePermissions)
 
 	fileMeta.Description = meta["description"].(string)
 	fileMeta.Categories = meta["categories"].([]string)
