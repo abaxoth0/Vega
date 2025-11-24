@@ -3,9 +3,11 @@ package minio
 import (
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 	FileApplication "vega/packages/application/file"
+	"vega/packages/domain/entity"
 	StorageConnection "vega/packages/infrastructure/object-storage/connection"
 )
 
@@ -137,6 +139,9 @@ func TestObjectStorageDriver(t *testing.T) {
 		t.Log("Testing Driver.DeleteFiles(): OK")
 
 		fileContent := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+		desc := "test file"
+		enc := "utf-8"
+		categories := []string{"test", "temp"}
 
 		fileInputs := append(commonInvalidInputs, []testInputs{
 			{path: "/test-file.txt"},
@@ -149,36 +154,74 @@ func TestObjectStorageDriver(t *testing.T) {
 		}...)
 		paths := []string{}
 
+		permissions := entity.NewFilePermissions(
+			entity.ReadFilePermission|entity.UpdateFilePermission|entity.DeleteFilePermission,
+			entity.ReadFilePermission|entity.UpdateFilePermission,
+			entity.ReadFilePermission,
+		)
+
+		permissionsStr := "rudru-r--"
+
+		if permissions.String() != permissionsStr {
+			t.Errorf(
+				"File permissions mismatch: expected \"%s\", but got \"%s\"",
+				permissionsStr, permissions.String(),
+			)
+		}
+
+		wg := new(sync.WaitGroup)
+
 		t.Log("Testing Driver.UploadFile()...")
-		for _, input := range fileInputs {
-			paths = append(paths, input.path)
-			cmd := FileApplication.UploadFileCommand{
-				Bucket: bucketName,
-				Path:   input.path,
-			}
-			if !input.empty {
-				cmd.Content = strings.NewReader(fileContent)
-			} else {
-				input.invalid = true
-			}
-			if input.size == 0 {
-				cmd.ContentSize = int64(len(fileContent))
-			} else {
-				cmd.ContentSize = input.size
-				if cmd.ContentSize != int64(len(fileContent)) {
+		for i, input := range fileInputs {
+			t.Logf("\tUploading \"%s\"...", input.path)
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				paths = append(paths, input.path)
+				cmd := FileApplication.UploadFileCommand{
+					Bucket: bucketName,
+					Path:   input.path,
+					FileMeta: &entity.FileMetadata{
+						ID: strconv.Itoa(i),
+						Description: desc,
+						Categories: categories,
+						Owner: "auto-test",
+						Permissions: permissions,
+					},
+				}
+				if !input.empty {
+					cmd.Content = strings.NewReader(fileContent)
+					cmd.FileMeta.Encoding = enc
+				} else {
 					input.invalid = true
 				}
-			}
-			e := driver.UploadFile(&cmd)
-			// Allow invalid inputs to be used, but ignore the result.
-			// Just to see will it cause panic or some unexpected behaviour or not.
-			if e != nil && !input.invalid {
-				t.Errorf("Failed to upload file \"%s\": %v", input.path, e)
-			}
+				if input.size == 0 {
+					cmd.ContentSize = int64(len(fileContent))
+				} else {
+					cmd.ContentSize = input.size
+					if cmd.ContentSize != int64(len(fileContent)) {
+						input.invalid = true
+					}
+				}
+				e := driver.UploadFile(&cmd)
+				// Allow invalid inputs to be used, but ignore the result.
+				// Just to see will it cause panic or some unexpected behaviour or not.
+				if e != nil && !input.invalid {
+					t.Errorf("Failed to upload file \"%s\": %v", input.path, e)
+				}
+			}()
 		}
+		time.Sleep(time.Millisecond*100)
+		wg.Wait()
 		t.Log("Testing Driver.UploadFile(): OK")
 
 		t.Log("Testing Driver.DeleteBucket()...")
+		err = driver.DeleteBucket(&FileApplication.DeleteBucketCommand{
+			Name:  bucketName,
+		})
+		if err == nil {
+			t.Errorf("Error: non-empty bucket was deleted")
+		}
 		err = driver.DeleteBucket(&FileApplication.DeleteBucketCommand{
 			Name:  bucketName,
 			Force: true,
