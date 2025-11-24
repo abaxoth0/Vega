@@ -58,9 +58,9 @@ const (
 )
 
 const (
-	ReadFilePermission FilePermissionGroup = 1 << iota
+	DeleteFilePermission FilePermissionGroup = 1 << iota
 	UpdateFilePermission
-	DeleteFilePermission
+	ReadFilePermission
 )
 
 const (
@@ -77,29 +77,27 @@ var permissionMap = map[FilePermissionGroup]rune{
 }
 
 func (p FilePermissionGroup) String() string {
-	str := []rune{}
+    str := make([]rune, FilePermissionGroupSize)
 
-	p |= 1 << (FilePermissionGroupSize + 1)
-	for i := 1; i <= FilePermissionGroupSize; i++ {
-		if p & 1 != 0 {
-			permission := FilePermissionGroup(1 << (FilePermissionGroupSize-i))
-			char, ok := permissionMap[permission]
-			if !ok {
-				panic(fmt.Sprintf(
-					"invalid permission char \"%s\" for 0b%s",
-					string(char), strconv.FormatInt(int64(permission), 2),
-				))
-			}
-			str = append(str, char)
-		} else {
-			str = append(str, NoFilePermissionChar)
-		}
-		p >>= 1
-	}
+    // Process from most significant to least significant bit
+	for i := range FilePermissionGroupSize {
+        permission := FilePermissionGroup(1 << (FilePermissionGroupSize - 1 - i))
 
-	slices.Reverse(str)
+        if p&permission != 0 {
+            char, ok := permissionMap[permission]
+            if !ok {
+                panic(fmt.Sprintf(
+                    "invalid permission char \"%s\" for 0b%s",
+                    string(char), strconv.FormatInt(int64(permission), 2),
+                ))
+            }
+            str[i] = char
+        } else {
+            str[i] = NoFilePermissionChar
+        }
+    }
 
-	return string(str)
+    return string(str)
 }
 
 // File permissions works similar to Linux file permissions.
@@ -125,6 +123,10 @@ func (p FilePermissionGroup) String() string {
 // Hence, all subset sums are distinct.
 type FilePermissions uint32
 
+var alignmentBit = func() FilePermissionGroup {
+	return FilePermissionGroup(1 << (FilePermissionGroupSize*(FilePermissionGroupSize-1)))
+}()
+
 func NewFilePermissions(owner, shared, other FilePermissionGroup) FilePermissions {
 	offset := FilePermissionGroup(FilePermissionGroupSize)
 	// All bits must be aligned in groups by 3, so to keep this alignment need to add special bit,
@@ -133,7 +135,7 @@ func NewFilePermissions(owner, shared, other FilePermissionGroup) FilePermission
 	// 0b1<owner-group><shared-group><other-group>
 	//   ↑
 	//   alignment bit
-	return FilePermissions((((1 << offset*(offset-1)) | (owner << offset) | shared) << offset) | other)
+	return FilePermissions(((alignmentBit | (owner << offset) | shared) << offset) | other)
 }
 
 var emptyFilePermissions = NewFilePermissions(0,0,0)
@@ -175,13 +177,11 @@ func (p FilePermissions) GetOtherPermissions() FilePermissionGroup {
 }
 
 func (p FilePermissions) String() string {
-	str := []string{}
+	str := make([]string, FilePermissionGroupsAmount)
 
 	for i := range FilePermissionGroupsAmount {
-		str = append(str, p.getGroupWithRightOffset(FilePermissionGroupSize*i).String())
+		str[FilePermissionGroupsAmount-i-1] = p.getGroupWithRightOffset(FilePermissionGroupSize*i).String()
 	}
-
-	slices.Reverse(str)
 
 	return strings.Join(str, "")
 }
@@ -195,15 +195,14 @@ func ParseFilePermissionGroup(g string) (FilePermissionGroup, error) {
 	}
 
 	group := []rune(g)
-	slices.Reverse(group)
 
 	fpGroup := FilePermissionGroup(0)
 
 	// TODO probably this should be optimised
 
-	read   := rune(group[2])
+	read   := rune(group[0])
 	update := rune(group[1])
-	del    := rune(group[0])
+	del    := rune(group[2])
 
 	if read != ReadFilePermissionChar && read != NoFilePermissionChar {
 		return 0, ErrInvalidFilePermissionGroupFormat
