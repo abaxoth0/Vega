@@ -24,7 +24,7 @@ func connect(driver *Driver) error {
 func TestObjectStorageDriver(t *testing.T) {
 	driver := InitDriver()
 
-	t.Run("connection", func(t *testing.T) {
+	t.Run("Connection", func(t *testing.T) {
 		t.Log("Checking default driver status...")
 		if status := driver.Status(); status != StorageConnection.Disconnected {
 			t.Errorf("Invalid driver status, expected \"disconnected\", but got \"%s\"", status.String())
@@ -55,15 +55,16 @@ func TestObjectStorageDriver(t *testing.T) {
 		}
 		t.Log("Testing Driver.Disconnect(): OK")
 	})
+}
+func TestUseCasesImplementation(t *testing.T) {
+	driver := InitDriver()
+	if err := connect(driver); err != nil {
+		t.Fatalf("Connection failed")
+	}
+	bucketName := "vega--auto-test-" + strconv.FormatInt(time.Now().UnixMilli(), 10)
+	t.Log("Test bucket name: " + bucketName)
 
-	t.Run("UseCases", func(t *testing.T) {
-		if err := connect(driver); err != nil {
-			t.Fatalf("Connection failed")
-		}
-
-		bucketName := "vega--auto-test-" + strconv.FormatInt(time.Now().UnixMilli(), 10)
-		t.Log("Test bucket name: " + bucketName)
-
+	t.Run("MakeBucket()", func(t *testing.T) {
 		t.Log("Testing Driver.MakeBucket()...")
 		err := driver.MakeBucket(&FileApplication.MakeBucketCommand{
 			Name: bucketName,
@@ -73,45 +74,49 @@ func TestObjectStorageDriver(t *testing.T) {
 		}
 		t.Log("Testing Driver.MakeBucket(): OK")
 
-		type testInputs struct {
-			path    string
-			invalid bool
-			empty   bool
-			size    int64
+	})
+
+	type testInputs struct {
+		path    string
+		invalid bool
+		empty   bool
+		size    int64
+	}
+
+	pathOverflow := new(strings.Builder)
+	segmentOverflow := new(strings.Builder)
+	pathOverflow.WriteByte('/')
+	segmentOverflow.WriteByte('/')
+
+	for i := range 1100 {
+		pathOverflow.WriteByte('a')
+
+		segmentOverflow.WriteByte('a')
+		if i%300 == 0 {
+			segmentOverflow.WriteByte('/')
 		}
+	}
 
-		pathOverflow := new(strings.Builder)
-		segmentOverflow := new(strings.Builder)
-		pathOverflow.WriteByte('/')
-		segmentOverflow.WriteByte('/')
+	commonInvalidInputs := []testInputs{
+		{path: "", invalid: true},
+		{path: "/", invalid: true},
+		{path: "//", invalid: true},
+		{path: "///", invalid: true},
+		{path: ".", invalid: true},
+		{path: ".", invalid: true},
+		{path: "./", invalid: true},
+		{path: pathOverflow.String(), invalid: true},
+		{path: segmentOverflow.String(), invalid: true},
+	}
 
-		for i := range 1100 {
-			pathOverflow.WriteByte('a')
+	var err error
 
-			segmentOverflow.WriteByte('a')
-			if i%300 == 0 {
-				segmentOverflow.WriteByte('/')
-			}
-		}
-
-		commonInvalidInputs := []testInputs{
-			{path: "", invalid: true},
-			{path: "/", invalid: true},
-			{path: "//", invalid: true},
-			{path: "///", invalid: true},
-			{path: ".", invalid: true},
-			{path: ".", invalid: true},
-			{path: "./", invalid: true},
-			{path: pathOverflow.String(), invalid: true},
-			{path: segmentOverflow.String(), invalid: true},
-		}
-
+	t.Run("Mkdir()", func(t *testing.T) {
 		dirInputs := append(commonInvalidInputs, []testInputs{
 			{path: "/direcotry/"},
 			{path: "/direcotry", invalid: true},
 		}...)
 
-		t.Log("Testing Driver.Mkdir()...")
 		for _, input := range dirInputs {
 			err = driver.Mkdir(&FileApplication.MkdirCommand{
 				Bucket: bucketName,
@@ -122,22 +127,11 @@ func TestObjectStorageDriver(t *testing.T) {
 			}
 			t.Errorf("Invalid Driver.Mkdir() result. Should fail - %t. Error: %v", input.invalid, err)
 		}
-		t.Log("Testing Driver.Mkdir(): OK")
+	})
 
-		t.Log("Testing Driver.DeleteFiles()...")
-		for _, input := range dirInputs {
-			err = driver.DeleteFiles(&FileApplication.DeleteFilesCommand{
-				Bucket: bucketName,
-				Paths:  []string{input.path},
-			})
-			// Allow invalid inputs to be used, but ignore the result.
-			// Just to see will it cause panic or some unexpected behaviour or not.
-			if err != nil && !input.invalid {
-				t.Errorf("Failed to delete file \"%s\": %v", input.path, err)
-			}
-		}
-		t.Log("Testing Driver.DeleteFiles(): OK")
+	filesPaths := []string{}
 
+	t.Run("UploadFile()", func(t *testing.T) {
 		fileContent := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
 		desc := "test file"
 		enc := "utf-8"
@@ -152,7 +146,6 @@ func TestObjectStorageDriver(t *testing.T) {
 			{path: "/some/dir/file.txt", empty: true},
 			{path: "/and/another/one", size: 100},
 		}...)
-		paths := []string{}
 
 		permissions := entity.NewFilePermissions(
 			entity.ReadFilePermission|entity.UpdateFilePermission|entity.DeleteFilePermission,
@@ -169,25 +162,25 @@ func TestObjectStorageDriver(t *testing.T) {
 			)
 		}
 
+		meta := entity.FileMetadata{
+			Description: desc,
+			Categories: categories,
+			Owner: "auto-test",
+			Permissions: permissions,
+		}
+
 		wg := new(sync.WaitGroup)
 
-		t.Log("Testing Driver.UploadFile()...")
 		for i, input := range fileInputs {
-			t.Logf("\tUploading \"%s\"...", input.path)
+			t.Logf("Uploading \"%s\"...", input.path)
 			wg.Add(1)
-			go func() {
+			go func(m entity.FileMetadata) {
 				defer wg.Done()
-				paths = append(paths, input.path)
+				m.ID = strconv.Itoa(i)
 				cmd := FileApplication.UploadFileCommand{
 					Bucket: bucketName,
 					Path:   input.path,
-					FileMeta: &entity.FileMetadata{
-						ID: strconv.Itoa(i),
-						Description: desc,
-						Categories: categories,
-						Owner: "auto-test",
-						Permissions: permissions,
-					},
+					FileMeta: &m,
 				}
 				if !input.empty {
 					cmd.Content = strings.NewReader(fileContent)
@@ -203,19 +196,41 @@ func TestObjectStorageDriver(t *testing.T) {
 						input.invalid = true
 					}
 				}
+				if !input.invalid {
+					filesPaths = append(filesPaths, input.path)
+				}
 				e := driver.UploadFile(&cmd)
 				// Allow invalid inputs to be used, but ignore the result.
 				// Just to see will it cause panic or some unexpected behaviour or not.
 				if e != nil && !input.invalid {
 					t.Errorf("Failed to upload file \"%s\": %v", input.path, e)
 				}
-			}()
+			}(meta)
 		}
 		time.Sleep(time.Millisecond*100)
 		wg.Wait()
-		t.Log("Testing Driver.UploadFile(): OK")
+	})
 
-		t.Log("Testing Driver.DeleteBucket()...")
+	t.Run("DeleteFiles()", func(t *testing.T) {
+		for _, path := range filesPaths {
+			err = driver.DeleteFiles(&FileApplication.DeleteFilesCommand{
+				Bucket: bucketName,
+				Paths:  []string{path},
+			})
+			if err != nil {
+				t.Errorf("Failed to delete file \"%s\": %v", path, err)
+			}
+		}
+	})
+
+	t.Run("DeleteBucket()", func(t *testing.T) {
+		err = driver.Mkdir(&FileApplication.MkdirCommand{
+			Bucket: bucketName,
+			Path: "/prevent-bucket-deletion/"},
+		)
+		if err != nil {
+			t.Errorf("Error: faield to create directory for preventing bucket deletion")
+		}
 		err = driver.DeleteBucket(&FileApplication.DeleteBucketCommand{
 			Name:  bucketName,
 		})
@@ -229,6 +244,5 @@ func TestObjectStorageDriver(t *testing.T) {
 		if err != nil {
 			t.Errorf("Failed to delete bucket: %v", err)
 		}
-		t.Log("Testing Driver.DeleteBucket(): OK")
 	})
 }
