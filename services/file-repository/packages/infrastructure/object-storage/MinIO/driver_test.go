@@ -1,6 +1,9 @@
 package minio
 
 import (
+	"io"
+	"path"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -56,6 +59,29 @@ func TestObjectStorageDriver(t *testing.T) {
 		t.Log("Testing Driver.Disconnect(): OK")
 	})
 }
+
+// Calls handler over each item of iter. Runs each iteration in new goroutine.
+// Blocks until all handlers finish their jobs.
+func asyncProcess[T any](iter []T, handler func(index int, value T)) {
+	wg := new(sync.WaitGroup)
+	for i, v := range iter {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			handler(i, v)
+		}()
+	}
+	time.Sleep(time.Millisecond*10)
+	wg.Wait()
+}
+
+func fileNameFromPath(p string) string {
+	if p == "" {
+		return ""
+	}
+	return path.Base(p)
+}
+
 func TestUseCasesImplementation(t *testing.T) {
 	driver := InitDriver()
 	if err := connect(driver); err != nil {
@@ -131,12 +157,35 @@ func TestUseCasesImplementation(t *testing.T) {
 
 	filesPaths := []string{}
 
-	t.Run("UploadFile()", func(t *testing.T) {
-		fileContent := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-		desc := "test file"
-		enc := "utf-8"
-		categories := []string{"test", "temp"}
+	fileContent := "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
+	desc := "test file"
+	enc := "utf-8"
+	categories := []string{"test", "temp"}
 
+	permissions := entity.NewFilePermissions(
+		entity.ReadFilePermission|entity.UpdateFilePermission|entity.DeleteFilePermission,
+		entity.ReadFilePermission|entity.UpdateFilePermission,
+		entity.ReadFilePermission,
+		)
+
+	permissionsStr := "rudru-r--"
+
+	if permissions.String() != permissionsStr {
+		t.Errorf(
+			"File permissions mismatch: expected \"%s\", but got \"%s\"",
+			permissionsStr, permissions.String(),
+		)
+	}
+
+	meta := entity.FileMetadata{
+		Description: desc,
+		Categories: categories,
+		Owner: "auto-test",
+		Permissions: permissions,
+		ChecksumType: entity.DefaultChecksumType,
+	}
+
+	t.Run("UploadFile()", func(t *testing.T) {
 		fileInputs := append(commonInvalidInputs, []testInputs{
 			{path: "/test-file.txt"},
 			{path: "/f"},
@@ -147,35 +196,9 @@ func TestUseCasesImplementation(t *testing.T) {
 			{path: "/and/another/one", size: 100},
 		}...)
 
-		permissions := entity.NewFilePermissions(
-			entity.ReadFilePermission|entity.UpdateFilePermission|entity.DeleteFilePermission,
-			entity.ReadFilePermission|entity.UpdateFilePermission,
-			entity.ReadFilePermission,
-		)
-
-		permissionsStr := "rudru-r--"
-
-		if permissions.String() != permissionsStr {
-			t.Errorf(
-				"File permissions mismatch: expected \"%s\", but got \"%s\"",
-				permissionsStr, permissions.String(),
-			)
-		}
-
-		meta := entity.FileMetadata{
-			Description: desc,
-			Categories: categories,
-			Owner: "auto-test",
-			Permissions: permissions,
-		}
-
-		wg := new(sync.WaitGroup)
-
-		for i, input := range fileInputs {
-			t.Logf("Uploading \"%s\"...", input.path)
-			wg.Add(1)
-			go func(m entity.FileMetadata) {
-				defer wg.Done()
+		asyncProcess(fileInputs, func(i int, input testInputs) {
+			func (m entity.FileMetadata){
+				t.Logf("Uploading \"%s\"...", input.path)
 				m.ID = strconv.Itoa(i)
 				cmd := FileApplication.UploadFileCommand{
 					Bucket: bucketName,
@@ -206,13 +229,151 @@ func TestUseCasesImplementation(t *testing.T) {
 					t.Errorf("Failed to upload file \"%s\": %v", input.path, e)
 				}
 			}(meta)
-		}
-		time.Sleep(time.Millisecond*100)
-		wg.Wait()
+		})
+	})
+
+	t.Run("GetFileByPath()", func(t *testing.T) {
+		asyncProcess(filesPaths, func(_ int, path string) {
+			cmd := FileApplication.GetFileByPathQuery{
+				Bucket: bucketName,
+				Path:   path,
+			}
+			file, err := driver.GetFileByPath(&cmd)
+			if err != nil {
+				t.Errorf("Failed to get file \"%s\": %v", path, err)
+			}
+			if file.Size > 0 {
+				content, err := io.ReadAll(file.Content)
+				if err != nil {
+					t.Errorf("Failed to read content of \"%s\": %v", path, err)
+				}
+				if string(content) != fileContent {
+					t.Errorf("File content doesn't match")
+				}
+			}
+		})
+	})
+
+	t.Run("GetFileMetadataByPath()", func(t *testing.T) {
+		asyncProcess(filesPaths, func(_ int, path string) {
+			metadata, err := driver.GetFileMetadataByPath(&FileApplication.GetFileByPathQuery{
+				Bucket: bucketName, Path: path,
+			})
+			if err != nil {
+				t.Fatalf("Failed to get metadata of \"%s\": %v", path, err)
+			}
+
+			// TODO I belive all this crap below can be optimise via reflection
+
+			if metadata.OriginalName != fileNameFromPath(path) {
+				t.Errorf(
+					"Metadata mismatch for OriginalName: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.OriginalName, path, path,
+				)
+			}
+			if metadata.Path != meta.Path {
+				t.Errorf(
+					"Metadata mismatch for Path: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.Path, meta.Path, path,
+				)
+			}
+
+			if metadata.Encoding != meta.Encoding {
+				t.Errorf(
+					"Metadata mismatch for Encoding: got \"%v\", but was \"%v\". File: \"%s\"",
+					path, metadata.Encoding, path,
+				)
+			}
+			if metadata.MIMEType == "" {
+				t.Errorf("Metadata missing MIMEType. File: \"%s\"", path)
+			}
+			if metadata.Checksum != meta.Checksum {
+				t.Errorf(
+					"Metadata mismatch for Checksum: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.Checksum, meta.Checksum, path,
+				)
+			}
+			if metadata.ChecksumType != meta.ChecksumType {
+				t.Errorf(
+					"Metadata mismatch for ChecksumType: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.ChecksumType, meta.ChecksumType, path,
+				)
+			}
+
+			if metadata.Owner != meta.Owner {
+				t.Errorf(
+					"Metadata mismatch for Owner: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.Owner, meta.Owner, path,
+				)
+			}
+			if metadata.UploadedBy != meta.UploadedBy {
+				t.Errorf(
+					"Metadata mismatch for UploadedBy: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.UploadedBy, meta.UploadedBy, path,
+				)
+			}
+			if metadata.Permissions != meta.Permissions {
+				t.Errorf(
+					"Metadata mismatch for Permissions: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.Permissions, meta.Permissions, path,
+				)
+			}
+
+			if metadata.Description != meta.Description {
+				t.Errorf(
+					"Metadata mismatch for Description: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.Description, meta.Description, path,
+				)
+			}
+			if !slices.Equal(metadata.Categories, meta.Categories) {
+				t.Errorf(
+					"Metadata mismatch for Categories: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.Categories, meta.Categories, path,
+				)
+			}
+			if !slices.Equal(metadata.Tags, meta.Tags) {
+				t.Errorf(
+					"Metadata mismatch for Tags: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.Tags, meta.Tags, path,
+				)
+			}
+
+			if metadata.UploadedAt != meta.UploadedAt {
+				t.Errorf(
+					"Metadata mismatch for UploadedAt: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.UploadedAt, meta.UploadedAt, path,
+				)
+			}
+			if metadata.UpdatedAt != meta.UpdatedAt {
+				t.Errorf(
+					"Metadata mismatch for UpdatedAt: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.UpdatedAt, meta.UpdatedAt, path,
+				)
+			}
+			if metadata.CreatedAt != meta.CreatedAt {
+				t.Errorf(
+					"Metadata mismatch for CreatedAt: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.CreatedAt, meta.CreatedAt, path,
+				)
+			}
+			if metadata.AccessedAt != meta.AccessedAt {
+				t.Errorf(
+					"Metadata mismatch for AccessedAt: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.AccessedAt, meta.AccessedAt, path,
+				)
+			}
+
+			if metadata.Status != entity.DefaultFileStatus {
+				t.Errorf(
+					"Metadata mismatch for Status: got \"%v\", but was \"%v\". File: \"%s\"",
+					metadata.Status, meta.Status, path,
+				)
+			}
+		})
 	})
 
 	t.Run("DeleteFiles()", func(t *testing.T) {
-		for _, path := range filesPaths {
+		asyncProcess(filesPaths, func(_ int, path string) {
 			err = driver.DeleteFiles(&FileApplication.DeleteFilesCommand{
 				Bucket: bucketName,
 				Paths:  []string{path},
@@ -220,7 +381,7 @@ func TestUseCasesImplementation(t *testing.T) {
 			if err != nil {
 				t.Errorf("Failed to delete file \"%s\": %v", path, err)
 			}
-		}
+		})
 	})
 
 	t.Run("DeleteBucket()", func(t *testing.T) {
@@ -245,4 +406,8 @@ func TestUseCasesImplementation(t *testing.T) {
 			t.Errorf("Failed to delete bucket: %v", err)
 		}
 	})
+
+	if err := driver.Disconnect(); err != nil {
+		t.Logf("Failed to disconnect: %v", err)
+	}
 }
