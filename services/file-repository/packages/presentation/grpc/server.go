@@ -13,8 +13,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+var ErrServerNotStarted = errors.New("Server is not started, hence can't be stopped.")
+
 type Server struct {
-	storage objectstorage.ObjectStorageDriver
+	listening bool
+	server 	  *grpc.Server
+	storage   objectstorage.ObjectStorageDriver
+
 	file_repository.UnimplementedFileRepositoryServiceServer
 }
 
@@ -32,13 +37,24 @@ func (s *Server) Start(port uint16) error {
 		return err
 	}
 
-	grpcServer := grpc.NewServer()
-	file_repository.RegisterFileRepositoryServiceServer(grpcServer, s)
+	s.server = grpc.NewServer()
+	file_repository.RegisterFileRepositoryServiceServer(s.server, s)
 
-	if err := grpcServer.Serve(listener); err != nil {
+	s.listening = true
+
+	if err := s.server.Serve(listener); err != nil {
+		s.listening = false
 		return err
 	}
 
+	return nil
+}
+
+func (s *Server) Stop() error {
+	if !s.listening {
+		return ErrServerNotStarted
+	}
+	s.server.Stop()
 	return nil
 }
 
