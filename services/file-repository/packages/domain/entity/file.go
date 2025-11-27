@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"hash"
 	"io"
 	"log"
 	"slices"
@@ -34,7 +35,9 @@ const (
 	DefaultChecksumType string = "SHA256"
 )
 
-var DefaultChecksumHasher = sha256.New()
+var NewDefaultChecksumHasher = func() hash.Hash {
+	return sha256.New()
+}
 
 var fileStatuses = map[FileStatus]bool{
 	ActiveFileStatus:        true,

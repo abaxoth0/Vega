@@ -18,7 +18,6 @@ import (
 	miniocommon "vega/packages/infrastructure/object-storage/MinIO/common"
 	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
 
-	"github.com/abaxoth0/Vega/libs/go/packages/structs"
 	"github.com/gabriel-vasile/mimetype"
 	"github.com/minio/minio-go/v7"
 )
@@ -95,7 +94,8 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		return err
 	}
 
-	teedStream := io.TeeReader(cmd.Content, entity.DefaultChecksumHasher)
+	hasher := entity.NewDefaultChecksumHasher()
+	teedStream := io.TeeReader(cmd.Content, hasher)
 	mimeBuffer := make([]byte, 512)
 
 	n, err := teedStream.Read(mimeBuffer)
@@ -114,7 +114,7 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		Path:         cmd.Path,
 
 		MIMEType:     mimeType.String(),
-		Checksum:     hex.EncodeToString(entity.DefaultChecksumHasher.Sum(nil)),
+		Checksum:     hex.EncodeToString(hasher.Sum(nil)),
 		ChecksumType: entity.DefaultChecksumType,
 
 		Owner: 		 cmd.FileMeta.Owner,
@@ -158,23 +158,25 @@ func (h *defaultCommandHandler) UpdateFileMetadata(cmd *FileApplication.UpdateFi
 		return h.copyWithNewMetadata(ctx, cmd.Bucket, cmd.Path, cmd.NewMetadata)
 	}
 
-	return errors.New("bigus")
+	// TODO temp, replace it with more smth more optimal
+	return h.copyWithNewMetadata(ctx, cmd.Bucket, cmd.Path, cmd.NewMetadata)
 }
 
 func (h *defaultCommandHandler) copyWithNewMetadata(
 	ctx context.Context,
 	bucket string,
 	path string,
-	newMetadata structs.Meta,
+	newMetadata entity.FileMetadata,
 ) error {
 	src := minio.CopySrcOptions{
 		Bucket: bucket,
 		Object: path,
 	}
+	newMetadata.UpdatedAt = time.Now()
 	dest := minio.CopyDestOptions{
 		Bucket:          bucket,
 		Object:          path,
-		UserMetadata:    miniocommon.ConvertToRawMetadata(newMetadata),
+		UserMetadata:    MinIOCommon.ConvertToRawMetadata(newMetadata.Pack()),
 		ReplaceMetadata: true,
 	}
 
