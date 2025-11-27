@@ -3,6 +3,7 @@ package minioquery
 import (
 	"context"
 	"errors"
+	"strconv"
 	"strings"
 	"vega/packages/application"
 	FileApplication "vega/packages/application/file"
@@ -65,6 +66,17 @@ func (h *defaultQueryHandler) GetFileByPath(query *FileApplication.GetFileByPath
 	}, nil
 }
 
+func splitGroupedField(s string) []string {
+	// If string is empty strings.Split() retuns slice with 1 element - empty string.
+	split := strings.Split(s, ";")
+	if len(split) == 1 && split[0] == "" {
+		return []string{}
+	}
+	return split
+}
+
+var ErrMissingPermissions = errors.New("missing permissions")
+
 func (h *defaultQueryHandler) GetFileMetadataByPath(query *FileApplication.GetFileByPathQuery) (*entity.FileMetadata, error) {
 	if err := h.preprocessQuery(&query.CommandQuery, query.Path); err != nil {
 		return nil, err
@@ -82,32 +94,40 @@ func (h *defaultQueryHandler) GetFileMetadataByPath(query *FileApplication.GetFi
 		return nil, err
 	}
 
+	if stat.UserMetadata["Permissions"] == "" {
+		return nil, ErrMissingPermissions
+	}
+	permissions, err := strconv.Atoi(stat.UserMetadata["Permissions"])
+	if err != nil {
+		return nil, err
+	}
+
 	meta := structs.Meta{}
 
-	meta["id"] = stat.UserMetadata["id"]
-	meta["original-name"] = stat.UserMetadata["original-name"]
+	meta["id"] = stat.UserMetadata["Id"]
+	meta["original-name"] = stat.UserMetadata["Original-Name"]
 	meta["path"] = stat.Key
 
-	meta["encoding"] = stat.UserMetadata["encoding"]
-	meta["mime-type"] = stat.UserMetadata["mime-type"]
+	meta["encoding"] = stat.UserMetadata["Encoding"]
+	meta["mime-type"] = stat.UserMetadata["Mime-Type"]
 	meta["size"] = stat.Size
 	meta["checksum"] = stat.ChecksumSHA256
 	meta["checksum-type"] = "SHA256"
 
-	meta["owner"] = stat.Owner.ID
-	meta["uploaded-by"] = stat.UserMetadata["uploaded-by"]
-	meta["permissions"] = stat.UserMetadata["permissions"]
+	meta["owner"] = stat.UserMetadata["Owner"]
+	meta["uploaded-by"] = stat.UserMetadata["Uploaded-By"]
+	meta["permissions"] = entity.FilePermissions(permissions)
 
-	meta["description"] = stat.UserMetadata["description"]
-	meta["categories"] = strings.Split(stat.UserMetadata["categories"], ";")
-	meta["tags"] = strings.Split(stat.UserMetadata["tags"], ";")
+	meta["description"] = stat.UserMetadata["Description"]
+	meta["categories"] = splitGroupedField(stat.UserMetadata["Categories"])
+	meta["tags"] = splitGroupedField(stat.UserMetadata["Tags"])
 
-	meta["status"] = entity.FileStatus(stat.UserMetadata["status"])
+	meta["status"] = entity.FileStatus(stat.UserMetadata["Status"])
 
-	meta["uploaded-at"] = stat.UserMetadata["uploaded-at"]
-	meta["updated-at"] = stat.UserMetadata["updated-at"]
-	meta["created-at"] = stat.UserMetadata["created-at"]
-	meta["accessed-at"] = stat.UserMetadata["accessed-at"]
+	meta["uploaded-at"] = stat.UserMetadata["Uploaded-At"]
+	meta["updated-at"] = stat.UserMetadata["Updated-At"]
+	meta["created-at"] = stat.UserMetadata["Created-At"]
+	meta["accessed-at"] = stat.UserMetadata["Accessed-At"]
 
 	structuredMetadata, err := entity.NewFileMetadata(meta)
 	if err != nil {

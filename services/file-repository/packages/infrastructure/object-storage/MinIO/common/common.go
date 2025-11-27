@@ -34,6 +34,7 @@ var metadataFields = []string{
 	"created-at",
 	"accessed-at",
 	"status",
+	"owner",
 }
 
 func toString(v any) string {
@@ -48,6 +49,10 @@ func toString(v any) string {
 		return src.Format(time.RFC3339)
 	case entity.FileStatus:
 		return src.String()
+	case entity.FilePermissions:
+		return strconv.Itoa(int(src))
+	case entity.FilePermissionGroup:
+		return strconv.Itoa(int(src))
 	default:
 		return ""
 	}

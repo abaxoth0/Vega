@@ -3,7 +3,6 @@ package miniocommand
 import (
 	"bytes"
 	"context"
-	"crypto/sha256"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -96,8 +95,7 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		return err
 	}
 
-	hasher := sha256.New()
-	teedStream := io.TeeReader(cmd.Content, hasher)
+	teedStream := io.TeeReader(cmd.Content, entity.DefaultChecksumHasher)
 	mimeBuffer := make([]byte, 512)
 
 	n, err := teedStream.Read(mimeBuffer)
@@ -115,10 +113,9 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		OriginalName: path.Base(cmd.Path),
 		Path:         cmd.Path,
 
-		Encoding: 	  cmd.FileMeta.Encoding,
 		MIMEType:     mimeType.String(),
-		Checksum:     hex.EncodeToString(hasher.Sum(nil)),
-		ChecksumType: "sha256",
+		Checksum:     hex.EncodeToString(entity.DefaultChecksumHasher.Sum(nil)),
+		ChecksumType: entity.DefaultChecksumType,
 
 		Owner: 		 cmd.FileMeta.Owner,
 		UploadedBy:  cmd.FileMeta.UploadedBy,
@@ -131,7 +128,7 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		UploadedAt: now,
 		CreatedAt:  now, // TODO temp
 
-		Status: entity.ActiveFileStatus,
+		Status: entity.DefaultFileStatus,
 	}
 
 	_, err = storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, multiPartStream, cmd.ContentSize, minio.PutObjectOptions{

@@ -2,6 +2,7 @@ package entity
 
 import (
 	"context"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
@@ -27,6 +28,13 @@ const (
 	ArchivedFileStatus      FileStatus = "archived"
 	PendingReviewFilestatus FileStatus = "pending review"
 )
+
+const (
+	DefaultFileStatus FileStatus = ActiveFileStatus
+	DefaultChecksumType string = "SHA256"
+)
+
+var DefaultChecksumHasher = sha256.New()
 
 var fileStatuses = map[FileStatus]bool{
 	ActiveFileStatus:        true,
