@@ -372,6 +372,71 @@ func TestUseCasesImplementation(t *testing.T) {
 		})
 	})
 
+	newFileContent := []byte("some new file content")
+
+	t.Run("UpdateFileContent()", func(t *testing.T) {
+		asyncProcess(filesPaths, func(_ int, path string) {
+			err = driver.UpdateFileContent(&FileApplication.UpdateFileContentCommand{
+				Path: path,
+				Bucket: bucketName,
+				NewContent: newFileContent,
+			})
+			if err != nil {
+				t.Fatalf("Failed to update file content \"%s\": %v", path, err)
+			}
+			file, err := driver.GetFileByPath(&FileApplication.GetFileByPathQuery{
+				Bucket: bucketName,
+				Path:   path,
+			})
+			if err != nil {
+				t.Fatalf("Failed to get file \"%s\": %v", path, err)
+			}
+			if file.Size == 0 {
+				t.Fatalf("Missing file contnent. File \"%s\"", path)
+			}
+			content, err := io.ReadAll(file.Content)
+			if err != nil {
+				t.Fatalf("Failed to read content of \"%s\": %v", path, err)
+			}
+			if string(content) != string(newFileContent) {
+				t.Errorf("New file content doesn't match")
+			}
+		})
+	})
+
+	newMeta := meta
+	newMeta.Description = "some new file description"
+	newMeta.Permissions = entity.NewFilePermissions(entity.ReadFilePermission, entity.ReadFilePermission, 0)
+	newMeta.Status = entity.PendingReviewFilestatus
+
+	t.Run("UpdateFileMetadata()", func(t *testing.T) {
+		asyncProcess(filesPaths, func(_ int, path string) {
+			err = driver.UpdateFileMetadata(&FileApplication.UpdateFileMetadataCommand{
+				Path: path,
+				Bucket: bucketName,
+				NewMetadata: newMeta,
+			})
+			if err != nil {
+				t.Fatalf("Failed to update metadata of \"%s\": %v", path, err)
+			}
+			metadata, err := driver.GetFileMetadataByPath(&FileApplication.GetFileByPathQuery{
+				Bucket: bucketName, Path: path,
+			})
+			if err != nil {
+				t.Fatalf("Failed to get metadata of \"%s\": %v", path, err)
+			}
+			if metadata.Description == meta.Description {
+				t.Fatalf("Failed to update metadata - Description didn't changed. File \"%s\"", path)
+			}
+			if metadata.Permissions == meta.Permissions {
+				t.Fatalf("Failed to update metadata - Permissions didn't changed. File \"%s\"", path)
+			}
+			if metadata.Status == meta.Status {
+				t.Fatalf("Failed to update metadata - Status didn't changed. File \"%s\"", path)
+			}
+		})
+	})
+
 	t.Run("DeleteFiles()", func(t *testing.T) {
 		asyncProcess(filesPaths, func(_ int, path string) {
 			err = driver.DeleteFiles(&FileApplication.DeleteFilesCommand{
