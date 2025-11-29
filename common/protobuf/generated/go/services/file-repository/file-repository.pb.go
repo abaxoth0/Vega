@@ -7,7 +7,6 @@
 package file_repository
 
 import (
-	types "github.com/abaxoth0/Vega/common/protobuf/generated/go/types"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -26,55 +25,46 @@ var File_services_file_repository_file_repository_proto protoreflect.FileDescrip
 
 const file_services_file_repository_file_repository_proto_rawDesc = "" +
 	"\n" +
-	".services/file-repository/file-repository.proto\x12\x0ffile_repository\x1a$services/file-repository/types.proto\x1a\x10types/file.proto\x1a\x1bgoogle/protobuf/empty.proto2\xbe\x05\n" +
+	".services/file-repository/file-repository.proto\x12\x0ffile_repository\x1a$services/file-repository/types.proto\x1a\x1bgoogle/protobuf/empty.proto2\x86\x04\n" +
 	"\x15FileRepositoryService\x12X\n" +
 	"\vHealthCheck\x12#.file_repository.HealthCheckRequest\x1a$.file_repository.HealthCheckResponse\x12T\n" +
-	"\rGetFileByPath\x12%.file_repository.GetFileByPathRequest\x1a\x1a.file_repository.FileChunk0\x01\x12\\\n" +
-	"\x15GetFileMetadataByPath\x12-.file_repository.GetFileMetadataByPathRequest\x1a\x14.common.FileMetadata\x12>\n" +
+	"\rGetFileByPath\x12%.file_repository.GetFileByPathRequest\x1a\x1a.file_repository.FileChunk0\x01\x12>\n" +
 	"\x05Mkdir\x12\x1d.file_repository.MkdirRequest\x1a\x16.google.protobuf.Empty\x12W\n" +
 	"\n" +
 	"UploadFile\x12\".file_repository.UploadFileRequest\x1a#.file_repository.UploadFileResponse(\x01\x12X\n" +
-	"\x11UpdateFileContent\x12).file_repository.UpdateFileContentRequest\x1a\x16.google.protobuf.Empty(\x01\x12X\n" +
-	"\x12UpdateFileMetadata\x12*.file_repository.UpdateFileMetadataRequest\x1a\x16.google.protobuf.Empty\x12J\n" +
+	"\x11UpdateFileContent\x12).file_repository.UpdateFileContentRequest\x1a\x16.google.protobuf.Empty(\x01\x12J\n" +
 	"\vDeleteFiles\x12#.file_repository.DeleteFilesRequest\x1a\x16.google.protobuf.EmptyBPZNgithub.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repositoryb\x06proto3"
 
 var file_services_file_repository_file_repository_proto_goTypes = []any{
-	(*HealthCheckRequest)(nil),           // 0: file_repository.HealthCheckRequest
-	(*GetFileByPathRequest)(nil),         // 1: file_repository.GetFileByPathRequest
-	(*GetFileMetadataByPathRequest)(nil), // 2: file_repository.GetFileMetadataByPathRequest
-	(*MkdirRequest)(nil),                 // 3: file_repository.MkdirRequest
-	(*UploadFileRequest)(nil),            // 4: file_repository.UploadFileRequest
-	(*UpdateFileContentRequest)(nil),     // 5: file_repository.UpdateFileContentRequest
-	(*UpdateFileMetadataRequest)(nil),    // 6: file_repository.UpdateFileMetadataRequest
-	(*DeleteFilesRequest)(nil),           // 7: file_repository.DeleteFilesRequest
-	(*HealthCheckResponse)(nil),          // 8: file_repository.HealthCheckResponse
-	(*FileChunk)(nil),                    // 9: file_repository.FileChunk
-	(*types.FileMetadata)(nil),           // 10: common.FileMetadata
-	(*emptypb.Empty)(nil),                // 11: google.protobuf.Empty
-	(*UploadFileResponse)(nil),           // 12: file_repository.UploadFileResponse
+	(*HealthCheckRequest)(nil),       // 0: file_repository.HealthCheckRequest
+	(*GetFileByPathRequest)(nil),     // 1: file_repository.GetFileByPathRequest
+	(*MkdirRequest)(nil),             // 2: file_repository.MkdirRequest
+	(*UploadFileRequest)(nil),        // 3: file_repository.UploadFileRequest
+	(*UpdateFileContentRequest)(nil), // 4: file_repository.UpdateFileContentRequest
+	(*DeleteFilesRequest)(nil),       // 5: file_repository.DeleteFilesRequest
+	(*HealthCheckResponse)(nil),      // 6: file_repository.HealthCheckResponse
+	(*FileChunk)(nil),                // 7: file_repository.FileChunk
+	(*emptypb.Empty)(nil),            // 8: google.protobuf.Empty
+	(*UploadFileResponse)(nil),       // 9: file_repository.UploadFileResponse
 }
 var file_services_file_repository_file_repository_proto_depIdxs = []int32{
-	0,  // 0: file_repository.FileRepositoryService.HealthCheck:input_type -> file_repository.HealthCheckRequest
-	1,  // 1: file_repository.FileRepositoryService.GetFileByPath:input_type -> file_repository.GetFileByPathRequest
-	2,  // 2: file_repository.FileRepositoryService.GetFileMetadataByPath:input_type -> file_repository.GetFileMetadataByPathRequest
-	3,  // 3: file_repository.FileRepositoryService.Mkdir:input_type -> file_repository.MkdirRequest
-	4,  // 4: file_repository.FileRepositoryService.UploadFile:input_type -> file_repository.UploadFileRequest
-	5,  // 5: file_repository.FileRepositoryService.UpdateFileContent:input_type -> file_repository.UpdateFileContentRequest
-	6,  // 6: file_repository.FileRepositoryService.UpdateFileMetadata:input_type -> file_repository.UpdateFileMetadataRequest
-	7,  // 7: file_repository.FileRepositoryService.DeleteFiles:input_type -> file_repository.DeleteFilesRequest
-	8,  // 8: file_repository.FileRepositoryService.HealthCheck:output_type -> file_repository.HealthCheckResponse
-	9,  // 9: file_repository.FileRepositoryService.GetFileByPath:output_type -> file_repository.FileChunk
-	10, // 10: file_repository.FileRepositoryService.GetFileMetadataByPath:output_type -> common.FileMetadata
-	11, // 11: file_repository.FileRepositoryService.Mkdir:output_type -> google.protobuf.Empty
-	12, // 12: file_repository.FileRepositoryService.UploadFile:output_type -> file_repository.UploadFileResponse
-	11, // 13: file_repository.FileRepositoryService.UpdateFileContent:output_type -> google.protobuf.Empty
-	11, // 14: file_repository.FileRepositoryService.UpdateFileMetadata:output_type -> google.protobuf.Empty
-	11, // 15: file_repository.FileRepositoryService.DeleteFiles:output_type -> google.protobuf.Empty
-	8,  // [8:16] is the sub-list for method output_type
-	0,  // [0:8] is the sub-list for method input_type
-	0,  // [0:0] is the sub-list for extension type_name
-	0,  // [0:0] is the sub-list for extension extendee
-	0,  // [0:0] is the sub-list for field type_name
+	0, // 0: file_repository.FileRepositoryService.HealthCheck:input_type -> file_repository.HealthCheckRequest
+	1, // 1: file_repository.FileRepositoryService.GetFileByPath:input_type -> file_repository.GetFileByPathRequest
+	2, // 2: file_repository.FileRepositoryService.Mkdir:input_type -> file_repository.MkdirRequest
+	3, // 3: file_repository.FileRepositoryService.UploadFile:input_type -> file_repository.UploadFileRequest
+	4, // 4: file_repository.FileRepositoryService.UpdateFileContent:input_type -> file_repository.UpdateFileContentRequest
+	5, // 5: file_repository.FileRepositoryService.DeleteFiles:input_type -> file_repository.DeleteFilesRequest
+	6, // 6: file_repository.FileRepositoryService.HealthCheck:output_type -> file_repository.HealthCheckResponse
+	7, // 7: file_repository.FileRepositoryService.GetFileByPath:output_type -> file_repository.FileChunk
+	8, // 8: file_repository.FileRepositoryService.Mkdir:output_type -> google.protobuf.Empty
+	9, // 9: file_repository.FileRepositoryService.UploadFile:output_type -> file_repository.UploadFileResponse
+	8, // 10: file_repository.FileRepositoryService.UpdateFileContent:output_type -> google.protobuf.Empty
+	8, // 11: file_repository.FileRepositoryService.DeleteFiles:output_type -> google.protobuf.Empty
+	6, // [6:12] is the sub-list for method output_type
+	0, // [0:6] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_services_file_repository_file_repository_proto_init() }

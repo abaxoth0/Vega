@@ -86,7 +86,7 @@ type FileMetadata struct {
 	ChecksumType  string                 `protobuf:"bytes,8,opt,name=checksum_type,json=checksumType,proto3" json:"checksum_type,omitempty"`
 	Owner         string                 `protobuf:"bytes,9,opt,name=owner,proto3" json:"owner,omitempty"`
 	UploadedBy    string                 `protobuf:"bytes,10,opt,name=uploaded_by,json=uploadedBy,proto3" json:"uploaded_by,omitempty"`
-	Permissions   string                 `protobuf:"bytes,11,opt,name=permissions,proto3" json:"permissions,omitempty"`
+	Permissions   int32                  `protobuf:"varint,11,opt,name=permissions,proto3" json:"permissions,omitempty"`
 	Description   string                 `protobuf:"bytes,12,opt,name=description,proto3" json:"description,omitempty"`
 	Categories    []string               `protobuf:"bytes,13,rep,name=categories,proto3" json:"categories,omitempty"`
 	Tags          []string               `protobuf:"bytes,14,rep,name=tags,proto3" json:"tags,omitempty"`
@@ -199,11 +199,11 @@ func (x *FileMetadata) GetUploadedBy() string {
 	return ""
 }
 
-func (x *FileMetadata) GetPermissions() string {
+func (x *FileMetadata) GetPermissions() int32 {
 	if x != nil {
 		return x.Permissions
 	}
-	return ""
+	return 0
 }
 
 func (x *FileMetadata) GetDescription() string {
@@ -280,7 +280,7 @@ const file_types_file_proto_rawDesc = "" +
 	"\vuploaded_by\x18\n" +
 	" \x01(\tR\n" +
 	"uploadedBy\x12 \n" +
-	"\vpermissions\x18\v \x01(\tR\vpermissions\x12 \n" +
+	"\vpermissions\x18\v \x01(\x05R\vpermissions\x12 \n" +
 	"\vdescription\x18\f \x01(\tR\vdescription\x12\x1e\n" +
 	"\n" +
 	"categories\x18\r \x03(\tR\n" +

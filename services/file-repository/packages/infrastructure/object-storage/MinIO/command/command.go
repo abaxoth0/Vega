@@ -3,22 +3,15 @@ package miniocommand
 import (
 	"bytes"
 	"context"
-	"encoding/hex"
 	"errors"
 	"fmt"
-	"io"
-	"path"
 	"strconv"
 	"strings"
-	"time"
 	"vega/packages/application"
 	FileApplication "vega/packages/application/file"
-	"vega/packages/domain/entity"
 	MinIOCommon "vega/packages/infrastructure/object-storage/MinIO/common"
-	miniocommon "vega/packages/infrastructure/object-storage/MinIO/common"
 	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
 
-	"github.com/gabriel-vasile/mimetype"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -94,96 +87,13 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 		return err
 	}
 
-	hasher := entity.NewDefaultChecksumHasher()
-	teedStream := io.TeeReader(cmd.Content, hasher)
-	mimeBuffer := make([]byte, 512)
-
-	n, err := teedStream.Read(mimeBuffer)
-	if err != nil && err != io.EOF {
-		return err
-	}
-
-	mimeType := mimetype.Detect(mimeBuffer[:n])
-
-	multiPartStream := io.MultiReader(bytes.NewReader(mimeBuffer[:n]), teedStream)
-	now := time.Now()
-
-	meta := entity.FileMetadata{
-		ID: 		  cmd.FileMeta.ID,
-		OriginalName: path.Base(cmd.Path),
-		Path:         cmd.Path,
-
-		MIMEType:     mimeType.String(),
-		Checksum:     hex.EncodeToString(hasher.Sum(nil)),
-		ChecksumType: entity.DefaultChecksumType,
-
-		Owner: 		 cmd.FileMeta.Owner,
-		UploadedBy:  cmd.FileMeta.UploadedBy,
-		Permissions: cmd.FileMeta.Permissions,
-
-		Description: cmd.FileMeta.Description,
-		Categories:  cmd.FileMeta.Categories,
-		Tags: 		 cmd.FileMeta.Tags,
-
-		UploadedAt: now,
-		CreatedAt:  now, // TODO temp
-
-		Status: entity.DefaultFileStatus,
-	}
-
-	_, err = storage.Client.PutObject(ctx, cmd.Bucket, cmd.Path, multiPartStream, cmd.ContentSize, minio.PutObjectOptions{
-		UserMetadata: miniocommon.ConvertToRawMetadata(meta.Pack()),
-	})
+	_, err := storage.Client.PutObject(
+		ctx, cmd.Bucket, cmd.Path, cmd.Content, cmd.ContentSize, minio.PutObjectOptions{},
+	)
 	if err != nil {
 		return err
 	}
 
-	return nil
-}
-
-func (h *defaultCommandHandler) UpdateFileMetadata(cmd *FileApplication.UpdateFileMetadataCommand) error {
-	if err := h.preprocessTargetedCommandQuery(&cmd.CommandQuery, cmd.Path); err != nil {
-		return err
-	}
-
-	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
-	defer cancel()
-
-	info, err := storage.Client.StatObject(ctx, cmd.Bucket, cmd.Path, minio.StatObjectOptions{})
-	if err != nil {
-		return err
-	}
-
-	if info.Size < entity.SmallFileSizeThreshold {
-		return h.copyWithNewMetadata(ctx, cmd.Bucket, cmd.Path, cmd.NewMetadata)
-	}
-
-	// TODO temp, replace it with more smth more optimal
-	return h.copyWithNewMetadata(ctx, cmd.Bucket, cmd.Path, cmd.NewMetadata)
-}
-
-func (h *defaultCommandHandler) copyWithNewMetadata(
-	ctx context.Context,
-	bucket string,
-	path string,
-	newMetadata entity.FileMetadata,
-) error {
-	src := minio.CopySrcOptions{
-		Bucket: bucket,
-		Object: path,
-	}
-	newMetadata.UpdatedAt = time.Now()
-	dest := minio.CopyDestOptions{
-		Bucket:          bucket,
-		Object:          path,
-		UserMetadata:    MinIOCommon.ConvertToRawMetadata(newMetadata.Pack()),
-		ReplaceMetadata: true,
-	}
-
-	_, err := storage.Client.CopyObject(ctx, dest, src)
-	if err != nil {
-		return err
-	}
 	return nil
 }
 

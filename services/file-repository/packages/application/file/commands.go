@@ -3,7 +3,6 @@ package fileapplication
 import (
 	"io"
 	"vega/packages/application"
-	"vega/packages/domain/entity"
 )
 
 type MkdirCommand struct {
@@ -14,19 +13,10 @@ type MkdirCommand struct {
 }
 
 type UploadFileCommand struct {
-	FileMeta    *entity.FileMetadata
 	Content     io.Reader
 	ContentSize int64
 	Path        string
 	Bucket      string
-
-	application.CommandQuery
-}
-
-type UpdateFileMetadataCommand struct {
-	Path        string
-	Bucket      string
-	NewMetadata entity.FileMetadata
 
 	application.CommandQuery
 }

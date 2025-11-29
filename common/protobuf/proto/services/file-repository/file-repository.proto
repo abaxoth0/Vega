@@ -5,7 +5,6 @@ package file_repository;
 option go_package = "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository";
 
 import "services/file-repository/types.proto";
-import "types/file.proto";
 import "google/protobuf/empty.proto";
 
 service FileRepositoryService {
@@ -13,12 +12,10 @@ service FileRepositoryService {
 
   // Queries
   rpc GetFileByPath(GetFileByPathRequest) returns (stream FileChunk);
-  rpc GetFileMetadataByPath(GetFileMetadataByPathRequest) returns (common.FileMetadata);
 
   // Commands
   rpc Mkdir(MkdirRequest) returns (google.protobuf.Empty);
   rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse);
   rpc UpdateFileContent(stream UpdateFileContentRequest) returns (google.protobuf.Empty);
-  rpc UpdateFileMetadata(UpdateFileMetadataRequest) returns (google.protobuf.Empty);
   rpc DeleteFiles(DeleteFilesRequest) returns (google.protobuf.Empty);
 }

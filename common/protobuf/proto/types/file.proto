@@ -26,7 +26,7 @@ message FileMetadata {
 
   string owner = 9;
   string uploaded_by = 10;
-  string permissions = 11;
+  int32 permissions = 11;
 
   string description = 12;
   repeated string categories = 13;

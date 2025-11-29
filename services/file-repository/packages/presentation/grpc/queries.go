@@ -1,15 +1,15 @@
 package grpc
 
 import (
-	"context"
 	"io"
 	"log"
 	FileApplication "vega/packages/application/file"
 
 	file_repository "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository"
-	"github.com/abaxoth0/Vega/common/protobuf/generated/go/types"
 	"google.golang.org/grpc"
 )
+
+const downloadChunkSize int64 = 64 * 1024
 
 func (s *Server) GetFileByPath(
 	req *file_repository.GetFileByPathRequest,
@@ -24,7 +24,7 @@ func (s *Server) GetFileByPath(
 	}
 	defer fileStream.Cancel()
 
-	chunkSize := int64(64 * 1024)
+	chunkSize := downloadChunkSize
 	if req.ChunkSize > 0 {
 		chunkSize = int64(req.ChunkSize)
 	}
@@ -44,15 +44,13 @@ func (s *Server) GetFileByPath(
 		req.GetPath(), fileStream.Size, totalChunks, chunkSize,
 	)
 
-	sending := true
-	for sending {
+	streaming := true
+	for streaming {
 		n, err := fileStream.Content.Read(buf)
-		if err != nil {
-			if err == io.EOF {
-				sending = false
-			} else {
-				return err
-			}
+		if err == io.EOF {
+			streaming = false
+		} else if err != nil {
+			return err
 		}
 
 		chunk := &file_repository.FileChunk{
@@ -60,17 +58,11 @@ func (s *Server) GetFileByPath(
 			ChunkIndex: chunkIndex,
 			TotalSize:  fileStream.Size,
 		}
-
 		if err := stream.Send(chunk); err != nil {
 			return err
 		}
-
 		chunkIndex++
 	}
 
 	return nil
-}
-
-func (s *Server) GetFileMetadataByPath(context.Context, *file_repository.GetFileMetadataByPathRequest) (*types.FileMetadata, error) {
-	panic("GetFileMetadataByPath() is not implemented")
 }

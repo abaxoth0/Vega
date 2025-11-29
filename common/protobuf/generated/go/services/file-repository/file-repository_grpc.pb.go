@@ -8,7 +8,6 @@ package file_repository
 
 import (
 	context "context"
-	types "github.com/abaxoth0/Vega/common/protobuf/generated/go/types"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -21,14 +20,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	FileRepositoryService_HealthCheck_FullMethodName           = "/file_repository.FileRepositoryService/HealthCheck"
-	FileRepositoryService_GetFileByPath_FullMethodName         = "/file_repository.FileRepositoryService/GetFileByPath"
-	FileRepositoryService_GetFileMetadataByPath_FullMethodName = "/file_repository.FileRepositoryService/GetFileMetadataByPath"
-	FileRepositoryService_Mkdir_FullMethodName                 = "/file_repository.FileRepositoryService/Mkdir"
-	FileRepositoryService_UploadFile_FullMethodName            = "/file_repository.FileRepositoryService/UploadFile"
-	FileRepositoryService_UpdateFileContent_FullMethodName     = "/file_repository.FileRepositoryService/UpdateFileContent"
-	FileRepositoryService_UpdateFileMetadata_FullMethodName    = "/file_repository.FileRepositoryService/UpdateFileMetadata"
-	FileRepositoryService_DeleteFiles_FullMethodName           = "/file_repository.FileRepositoryService/DeleteFiles"
+	FileRepositoryService_HealthCheck_FullMethodName       = "/file_repository.FileRepositoryService/HealthCheck"
+	FileRepositoryService_GetFileByPath_FullMethodName     = "/file_repository.FileRepositoryService/GetFileByPath"
+	FileRepositoryService_Mkdir_FullMethodName             = "/file_repository.FileRepositoryService/Mkdir"
+	FileRepositoryService_UploadFile_FullMethodName        = "/file_repository.FileRepositoryService/UploadFile"
+	FileRepositoryService_UpdateFileContent_FullMethodName = "/file_repository.FileRepositoryService/UpdateFileContent"
+	FileRepositoryService_DeleteFiles_FullMethodName       = "/file_repository.FileRepositoryService/DeleteFiles"
 )
 
 // FileRepositoryServiceClient is the client API for FileRepositoryService service.
@@ -38,12 +35,10 @@ type FileRepositoryServiceClient interface {
 	HealthCheck(ctx context.Context, in *HealthCheckRequest, opts ...grpc.CallOption) (*HealthCheckResponse, error)
 	// Queries
 	GetFileByPath(ctx context.Context, in *GetFileByPathRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FileChunk], error)
-	GetFileMetadataByPath(ctx context.Context, in *GetFileMetadataByPathRequest, opts ...grpc.CallOption) (*types.FileMetadata, error)
 	// Commands
 	Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UploadFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadFileRequest, UploadFileResponse], error)
 	UpdateFileContent(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UpdateFileContentRequest, emptypb.Empty], error)
-	UpdateFileMetadata(ctx context.Context, in *UpdateFileMetadataRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -84,16 +79,6 @@ func (c *fileRepositoryServiceClient) GetFileByPath(ctx context.Context, in *Get
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type FileRepositoryService_GetFileByPathClient = grpc.ServerStreamingClient[FileChunk]
 
-func (c *fileRepositoryServiceClient) GetFileMetadataByPath(ctx context.Context, in *GetFileMetadataByPathRequest, opts ...grpc.CallOption) (*types.FileMetadata, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(types.FileMetadata)
-	err := c.cc.Invoke(ctx, FileRepositoryService_GetFileMetadataByPath_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *fileRepositoryServiceClient) Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -130,16 +115,6 @@ func (c *fileRepositoryServiceClient) UpdateFileContent(ctx context.Context, opt
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type FileRepositoryService_UpdateFileContentClient = grpc.ClientStreamingClient[UpdateFileContentRequest, emptypb.Empty]
 
-func (c *fileRepositoryServiceClient) UpdateFileMetadata(ctx context.Context, in *UpdateFileMetadataRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, FileRepositoryService_UpdateFileMetadata_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *fileRepositoryServiceClient) DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(emptypb.Empty)
@@ -157,12 +132,10 @@ type FileRepositoryServiceServer interface {
 	HealthCheck(context.Context, *HealthCheckRequest) (*HealthCheckResponse, error)
 	// Queries
 	GetFileByPath(*GetFileByPathRequest, grpc.ServerStreamingServer[FileChunk]) error
-	GetFileMetadataByPath(context.Context, *GetFileMetadataByPathRequest) (*types.FileMetadata, error)
 	// Commands
 	Mkdir(context.Context, *MkdirRequest) (*emptypb.Empty, error)
 	UploadFile(grpc.ClientStreamingServer[UploadFileRequest, UploadFileResponse]) error
 	UpdateFileContent(grpc.ClientStreamingServer[UpdateFileContentRequest, emptypb.Empty]) error
-	UpdateFileMetadata(context.Context, *UpdateFileMetadataRequest) (*emptypb.Empty, error)
 	DeleteFiles(context.Context, *DeleteFilesRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedFileRepositoryServiceServer()
 }
@@ -180,9 +153,6 @@ func (UnimplementedFileRepositoryServiceServer) HealthCheck(context.Context, *He
 func (UnimplementedFileRepositoryServiceServer) GetFileByPath(*GetFileByPathRequest, grpc.ServerStreamingServer[FileChunk]) error {
 	return status.Errorf(codes.Unimplemented, "method GetFileByPath not implemented")
 }
-func (UnimplementedFileRepositoryServiceServer) GetFileMetadataByPath(context.Context, *GetFileMetadataByPathRequest) (*types.FileMetadata, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetFileMetadataByPath not implemented")
-}
 func (UnimplementedFileRepositoryServiceServer) Mkdir(context.Context, *MkdirRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Mkdir not implemented")
 }
@@ -191,9 +161,6 @@ func (UnimplementedFileRepositoryServiceServer) UploadFile(grpc.ClientStreamingS
 }
 func (UnimplementedFileRepositoryServiceServer) UpdateFileContent(grpc.ClientStreamingServer[UpdateFileContentRequest, emptypb.Empty]) error {
 	return status.Errorf(codes.Unimplemented, "method UpdateFileContent not implemented")
-}
-func (UnimplementedFileRepositoryServiceServer) UpdateFileMetadata(context.Context, *UpdateFileMetadataRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateFileMetadata not implemented")
 }
 func (UnimplementedFileRepositoryServiceServer) DeleteFiles(context.Context, *DeleteFilesRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteFiles not implemented")
@@ -248,24 +215,6 @@ func _FileRepositoryService_GetFileByPath_Handler(srv interface{}, stream grpc.S
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type FileRepositoryService_GetFileByPathServer = grpc.ServerStreamingServer[FileChunk]
 
-func _FileRepositoryService_GetFileMetadataByPath_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFileMetadataByPathRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FileRepositoryServiceServer).GetFileMetadataByPath(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: FileRepositoryService_GetFileMetadataByPath_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileRepositoryServiceServer).GetFileMetadataByPath(ctx, req.(*GetFileMetadataByPathRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _FileRepositoryService_Mkdir_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(MkdirRequest)
 	if err := dec(in); err != nil {
@@ -298,24 +247,6 @@ func _FileRepositoryService_UpdateFileContent_Handler(srv interface{}, stream gr
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type FileRepositoryService_UpdateFileContentServer = grpc.ClientStreamingServer[UpdateFileContentRequest, emptypb.Empty]
 
-func _FileRepositoryService_UpdateFileMetadata_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateFileMetadataRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(FileRepositoryServiceServer).UpdateFileMetadata(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: FileRepositoryService_UpdateFileMetadata_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(FileRepositoryServiceServer).UpdateFileMetadata(ctx, req.(*UpdateFileMetadataRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _FileRepositoryService_DeleteFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteFilesRequest)
 	if err := dec(in); err != nil {
@@ -346,16 +277,8 @@ var FileRepositoryService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _FileRepositoryService_HealthCheck_Handler,
 		},
 		{
-			MethodName: "GetFileMetadataByPath",
-			Handler:    _FileRepositoryService_GetFileMetadataByPath_Handler,
-		},
-		{
 			MethodName: "Mkdir",
 			Handler:    _FileRepositoryService_Mkdir_Handler,
-		},
-		{
-			MethodName: "UpdateFileMetadata",
-			Handler:    _FileRepositoryService_UpdateFileMetadata_Handler,
 		},
 		{
 			MethodName: "DeleteFiles",
