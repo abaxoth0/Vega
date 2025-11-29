@@ -44,7 +44,7 @@ func withClient(t *testing.T, handler func(client file_repository.FileRepository
 		return
 	}
 
-	go func(){
+	go func() {
 		t.Logf("gRPC server started")
 		if err := server.Start(testPort); err != nil {
 			t.Fatalf("Failed to start gRPC server: %v", err)
@@ -54,7 +54,7 @@ func withClient(t *testing.T, handler func(client file_repository.FileRepository
 	}()
 
 	time.Sleep(time.Millisecond * 20)
-	defer func(){
+	defer func() {
 		t.Logf("Stopping gRPC server...")
 		if err := server.Stop(); err != nil {
 			t.Fatalf("Failed to start gRPC server: %v", err)
@@ -97,7 +97,7 @@ func TestRPC(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to connect to object storage: %v", err)
 	}
-	defer func (){
+	defer func() {
 		if err := objectstorage.Driver.Disconnect(); err != nil {
 			t.Fatalf("Failed to disconnect from object storage")
 		}
@@ -110,7 +110,7 @@ func TestRPC(t *testing.T) {
 
 			fileStream, err := client.GetFileByPath(ctx, &file_repository.GetFileByPathRequest{
 				Bucket: "test-bucket",
-				Path: "/file.txt",
+				Path:   "/file.txt",
 			})
 			if err != nil {
 				t.Fatalf("GetFileByPath() RPC failed: %v", err)

@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	ErrFileDoesNotExist = errors.New("requested file doesn't exist")
+	ErrFileDoesNotExist   = errors.New("requested file doesn't exist")
 	ErrBucketDoesNotExist = errors.New("requested bucket doesn't exist")
 )
 

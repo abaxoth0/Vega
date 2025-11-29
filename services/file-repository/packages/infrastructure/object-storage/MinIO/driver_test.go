@@ -68,7 +68,7 @@ func asyncProcess[T any](iter []T, handler func(index int, value T)) {
 			handler(i, v)
 		}()
 	}
-	time.Sleep(time.Millisecond*10)
+	time.Sleep(time.Millisecond * 10)
 	wg.Wait()
 }
 
@@ -218,8 +218,8 @@ func TestUseCasesImplementation(t *testing.T) {
 	t.Run("UpdateFileContent()", func(t *testing.T) {
 		asyncProcess(filesPaths, func(_ int, path string) {
 			err = driver.UpdateFileContent(&FileApplication.UpdateFileContentCommand{
-				Path: path,
-				Bucket: bucketName,
+				Path:       path,
+				Bucket:     bucketName,
 				NewContent: newFileContent,
 			})
 			if err != nil {
@@ -260,13 +260,13 @@ func TestUseCasesImplementation(t *testing.T) {
 	t.Run("DeleteBucket()", func(t *testing.T) {
 		err = driver.Mkdir(&FileApplication.MkdirCommand{
 			Bucket: bucketName,
-			Path: "/prevent-bucket-deletion/"},
+			Path:   "/prevent-bucket-deletion/"},
 		)
 		if err != nil {
 			t.Errorf("Error: faield to create directory for preventing bucket deletion")
 		}
 		err = driver.DeleteBucket(&FileApplication.DeleteBucketCommand{
-			Name:  bucketName,
+			Name: bucketName,
 		})
 		if err == nil {
 			t.Errorf("Error: non-empty bucket was deleted")

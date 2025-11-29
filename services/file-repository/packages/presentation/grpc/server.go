@@ -17,7 +17,7 @@ var ErrServerNotStarted = errors.New("Server is not started, hence can't be stop
 
 type Server struct {
 	listening bool
-	server 	  *grpc.Server
+	server    *grpc.Server
 	storage   objectstorage.ObjectStorageDriver
 
 	file_repository.UnimplementedFileRepositoryServiceServer

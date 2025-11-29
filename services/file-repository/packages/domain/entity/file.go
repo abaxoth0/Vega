@@ -9,10 +9,6 @@ const (
 	SmallFileSizeThreshold = 10 * 1024 * 1024 // 10 MB
 )
 
-type File struct {
-	Content []byte
-}
-
 type FileStream struct {
 	Content io.Reader
 	Size    int64
