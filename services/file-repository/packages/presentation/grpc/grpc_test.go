@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"strconv"
 	"testing"
@@ -45,22 +46,18 @@ func withClient(t *testing.T, handler func(client file_repository.FileRepository
 	}
 
 	go func() {
-		t.Logf("gRPC server started")
 		if err := server.Start(testPort); err != nil {
 			t.Fatalf("Failed to start gRPC server: %v", err)
 			return
 		}
-		t.Logf("gRPC server stopped")
 	}()
 
 	time.Sleep(time.Millisecond * 20)
 	defer func() {
-		t.Logf("Stopping gRPC server...")
 		if err := server.Stop(); err != nil {
 			t.Fatalf("Failed to start gRPC server: %v", err)
 			return
 		}
-		t.Logf("Stopping gRPC server: DONE")
 	}()
 
 	client, closeClient := new_grpc_clinet()
@@ -103,13 +100,15 @@ func TestRPC(t *testing.T) {
 		}
 	}()
 
+	const testBucket string = "test-bucket"
+
 	t.Run("GetFileByPath()", func(t *testing.T) {
 		withClient(t, func(client file_repository.FileRepositoryServiceClient) {
 			ctx, cancel := newRPCContext()
 			defer cancel()
 
 			fileStream, err := client.GetFileByPath(ctx, &file_repository.GetFileByPathRequest{
-				Bucket: "test-bucket",
+				Bucket: testBucket,
 				Path:   "/file.txt",
 			})
 			if err != nil {
@@ -129,6 +128,21 @@ func TestRPC(t *testing.T) {
 					break
 				}
 				t.Logf("Chunk content: %v\n", string(chunk.GetContent()))
+			}
+		})
+	})
+
+	t.Run("Mkdir()", func(t *testing.T) {
+		withClient(t, func(client file_repository.FileRepositoryServiceClient) {
+			context, cancel := newRPCContext()
+			defer cancel()
+
+			_, err := client.Mkdir(context, &file_repository.MkdirRequest{
+				Bucket: testBucket,
+				Path: fmt.Sprintf("/test/mkdir-%s/", time.Now().Format(time.RFC3339)),
+			})
+			if err != nil {
+				t.Fatalf("Mkdir() RPC failed: %v", err)
 			}
 		})
 	})
