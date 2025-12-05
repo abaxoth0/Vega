@@ -31,10 +31,16 @@ message MkdirRequest {
   string bucket = 2;
 }
 
-message UploadFileRequest {
+message FileContentHeader {
+    string path = 1;
+    string bucket = 2;
+    int64  size = 3;
+}
+
+message FileContentRequest {
   oneof data {
-    UploadMetadata metadata = 1;
-    bytes chunk = 2;
+    FileContentHeader header = 1;
+    bytes  chunk = 2;
   }
 }
 
@@ -46,8 +52,7 @@ message UploadMetadata {
 
 message UpdateFileContentRequest {
   oneof data {
-    UpdateContentMetadata metadata = 1;
-    bytes chunk = 2;
+    bytes chunk = 1;
   }
 }
 
@@ -74,7 +79,5 @@ message FileChunk {
 }
 
 message UploadFileResponse {
-  string file_id = 1;
-  int64  size = 2;
-  string checksum = 3;
+  bool success = 1;
 }

@@ -15,7 +15,7 @@ service FileRepositoryService {
 
   // Commands
   rpc Mkdir(MkdirRequest) returns (google.protobuf.Empty);
-  rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse);
-  rpc UpdateFileContent(stream UpdateFileContentRequest) returns (google.protobuf.Empty);
+  rpc UploadFile(stream FileContentRequest) returns (stream UploadFileResponse);
+  rpc UpdateFileContent(stream UpdateFileContentRequest) returns (stream google.protobuf.Empty);
   rpc DeleteFiles(DeleteFilesRequest) returns (google.protobuf.Empty);
 }
