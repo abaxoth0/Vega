@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"strconv"
 	"testing"
 	"time"
@@ -190,7 +191,7 @@ func TestRPC(t *testing.T) {
 				t.Fatalf("Failed to receive response: %v", err)
 			}
 
-			if !resp.Success {
+			if resp.Status != http.StatusOK {
 				t.Fatalf("Server reported upload failure")
 			}
 		})
