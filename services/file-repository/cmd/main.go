@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"log"
+	"time"
 	fileapplication "vega/packages/application/file"
 	ObjectStorage "vega/packages/infrastructure/object-storage"
 	StorageConnection "vega/packages/infrastructure/object-storage/connection"
@@ -13,7 +15,8 @@ import (
 )
 
 func main() {
-	testgRPC()
+	testStorage()
+	// testgRPC()
 }
 
 func testgRPC() {
@@ -53,8 +56,12 @@ func testStorage() {
 		panic(err)
 	}
 
-	file, err := ObjectStorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
-		Path:   "/my-new-file.txt",
+	if err := ObjectStorage.Driver.Ping(time.Second * 5); err != nil {
+		panic("failed to ping object storage")
+	}
+
+	_, err = ObjectStorage.Driver.GetFileByPath(&fileapplication.GetFileByPathQuery{
+		Path:   "/newfile.txt",
 		Bucket: "test-bucket",
 	})
 	if err != nil {
@@ -66,22 +73,22 @@ func testStorage() {
 	// }
 	// println(string(data))
 
-	e := ObjectStorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
-		FileMeta:    nil,
-		Content:     file.Content,
-		ContentSize: file.Size,
-		Path:        "/mime-test.txt",
-		Bucket:      "test-bucket",
-	})
+	// e := ObjectStorage.Driver.UploadFile(&fileapplication.UploadFileCommand{
+	// 	FileMeta:    nil,
+	// 	Content:     file.Content,
+	// 	ContentSize: file.Size,
+	// 	Path:        "/file.txt",
+	// 	Bucket:      "test-bucket",
+	// })
 	// e := objectstorage.Driver.DeleteFiles(&fileapplication.DeleteFilesCommand{
 	// 	Paths: []string{"/test1.txt", "/test2.txt", "/test4.txt"},
 	// 	Bucket: "test-bucket",
 	// })
-	// e := objectstorage.Driver.UpdateFileContent(&fileapplication.UpdateFileContentCommand{
-	// 	Path: "/my-new-file.txt",
-	// 	Bucket: "test-bucket",
-	// 	NewContent: []byte("full replace upd test"),
-	// })
+	e := ObjectStorage.Driver.UpdateFileContent(&fileapplication.UpdateFileContentCommand{
+		Path:       "/my-new-file.txt",
+		Bucket:     "test-bucket",
+		NewContent: bytes.NewReader([]byte("full replace upd test")),
+	})
 
 	// meta, e := objectstorage.Driver.GetFileMetadataByPath(&fileapplication.GetFileByPathQuery{
 	// 	Path: "/my-new-file.txt",

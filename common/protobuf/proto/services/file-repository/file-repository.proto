@@ -15,6 +15,6 @@ service FileRepositoryService {
   // Commands
   rpc Mkdir(MkdirRequest) returns (StatusResponse);
   rpc UploadFile(stream FileContentRequest) returns (stream StatusResponse);
-  rpc UpdateFileContent(stream UpdateFileContentRequest) returns (stream StatusResponse);
+  rpc UpdateFileContent(stream FileContentRequest) returns (stream StatusResponse);
   rpc DeleteFiles(DeleteFilesRequest) returns (StatusResponse);
 }

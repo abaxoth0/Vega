@@ -24,7 +24,8 @@ type UploadFileCommand struct {
 type UpdateFileContentCommand struct {
 	Path       string
 	Bucket     string
-	NewContent []byte
+	NewContent io.Reader
+	Size	   int64
 
 	application.CommandQuery
 }

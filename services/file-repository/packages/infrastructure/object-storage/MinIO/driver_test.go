@@ -1,6 +1,7 @@
 package minio
 
 import (
+	"bytes"
 	"io"
 	"strconv"
 	"strings"
@@ -220,7 +221,8 @@ func TestUseCasesImplementation(t *testing.T) {
 			err = driver.UpdateFileContent(&FileApplication.UpdateFileContentCommand{
 				Path:       path,
 				Bucket:     bucketName,
-				NewContent: newFileContent,
+				NewContent: bytes.NewReader(newFileContent),
+				Size: int64(len(newFileContent)),
 			})
 			if err != nil {
 				t.Fatalf("Failed to update file content \"%s\": %v", path, err)

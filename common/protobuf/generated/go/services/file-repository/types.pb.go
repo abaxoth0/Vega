@@ -7,7 +7,6 @@
 package file_repository
 
 import (
-	types "github.com/abaxoth0/Vega/common/protobuf/generated/go/types"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -178,58 +177,6 @@ func (x *GetFileByPathRequest) GetChunkSize() int32 {
 	return 0
 }
 
-type GetFileMetadataByPathRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	Bucket        string                 `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetFileMetadataByPathRequest) Reset() {
-	*x = GetFileMetadataByPathRequest{}
-	mi := &file_services_file_repository_types_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetFileMetadataByPathRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetFileMetadataByPathRequest) ProtoMessage() {}
-
-func (x *GetFileMetadataByPathRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetFileMetadataByPathRequest.ProtoReflect.Descriptor instead.
-func (*GetFileMetadataByPathRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *GetFileMetadataByPathRequest) GetPath() string {
-	if x != nil {
-		return x.Path
-	}
-	return ""
-}
-
-func (x *GetFileMetadataByPathRequest) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
-
 type MkdirRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
@@ -240,7 +187,7 @@ type MkdirRequest struct {
 
 func (x *MkdirRequest) Reset() {
 	*x = MkdirRequest{}
-	mi := &file_services_file_repository_types_proto_msgTypes[4]
+	mi := &file_services_file_repository_types_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -252,7 +199,7 @@ func (x *MkdirRequest) String() string {
 func (*MkdirRequest) ProtoMessage() {}
 
 func (x *MkdirRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[4]
+	mi := &file_services_file_repository_types_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -265,7 +212,7 @@ func (x *MkdirRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MkdirRequest.ProtoReflect.Descriptor instead.
 func (*MkdirRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{4}
+	return file_services_file_repository_types_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *MkdirRequest) GetPath() string {
@@ -293,7 +240,7 @@ type FileContentHeader struct {
 
 func (x *FileContentHeader) Reset() {
 	*x = FileContentHeader{}
-	mi := &file_services_file_repository_types_proto_msgTypes[5]
+	mi := &file_services_file_repository_types_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -305,7 +252,7 @@ func (x *FileContentHeader) String() string {
 func (*FileContentHeader) ProtoMessage() {}
 
 func (x *FileContentHeader) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[5]
+	mi := &file_services_file_repository_types_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -318,7 +265,7 @@ func (x *FileContentHeader) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileContentHeader.ProtoReflect.Descriptor instead.
 func (*FileContentHeader) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{5}
+	return file_services_file_repository_types_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *FileContentHeader) GetPath() string {
@@ -355,7 +302,7 @@ type FileContentRequest struct {
 
 func (x *FileContentRequest) Reset() {
 	*x = FileContentRequest{}
-	mi := &file_services_file_repository_types_proto_msgTypes[6]
+	mi := &file_services_file_repository_types_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -367,7 +314,7 @@ func (x *FileContentRequest) String() string {
 func (*FileContentRequest) ProtoMessage() {}
 
 func (x *FileContentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[6]
+	mi := &file_services_file_repository_types_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -380,7 +327,7 @@ func (x *FileContentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileContentRequest.ProtoReflect.Descriptor instead.
 func (*FileContentRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{6}
+	return file_services_file_repository_types_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *FileContentRequest) GetData() isFileContentRequest_Data {
@@ -424,244 +371,6 @@ func (*FileContentRequest_Header) isFileContentRequest_Data() {}
 
 func (*FileContentRequest_Chunk) isFileContentRequest_Data() {}
 
-type UploadMetadata struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FileMetadata  *types.FileMetadata    `protobuf:"bytes,1,opt,name=file_metadata,json=fileMetadata,proto3" json:"file_metadata,omitempty"`
-	Path          string                 `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
-	Bucket        string                 `protobuf:"bytes,3,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UploadMetadata) Reset() {
-	*x = UploadMetadata{}
-	mi := &file_services_file_repository_types_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UploadMetadata) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UploadMetadata) ProtoMessage() {}
-
-func (x *UploadMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UploadMetadata.ProtoReflect.Descriptor instead.
-func (*UploadMetadata) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *UploadMetadata) GetFileMetadata() *types.FileMetadata {
-	if x != nil {
-		return x.FileMetadata
-	}
-	return nil
-}
-
-func (x *UploadMetadata) GetPath() string {
-	if x != nil {
-		return x.Path
-	}
-	return ""
-}
-
-func (x *UploadMetadata) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
-
-type UpdateFileContentRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Data:
-	//
-	//	*UpdateFileContentRequest_Chunk
-	Data          isUpdateFileContentRequest_Data `protobuf_oneof:"data"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateFileContentRequest) Reset() {
-	*x = UpdateFileContentRequest{}
-	mi := &file_services_file_repository_types_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateFileContentRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateFileContentRequest) ProtoMessage() {}
-
-func (x *UpdateFileContentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateFileContentRequest.ProtoReflect.Descriptor instead.
-func (*UpdateFileContentRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *UpdateFileContentRequest) GetData() isUpdateFileContentRequest_Data {
-	if x != nil {
-		return x.Data
-	}
-	return nil
-}
-
-func (x *UpdateFileContentRequest) GetChunk() []byte {
-	if x != nil {
-		if x, ok := x.Data.(*UpdateFileContentRequest_Chunk); ok {
-			return x.Chunk
-		}
-	}
-	return nil
-}
-
-type isUpdateFileContentRequest_Data interface {
-	isUpdateFileContentRequest_Data()
-}
-
-type UpdateFileContentRequest_Chunk struct {
-	Chunk []byte `protobuf:"bytes,1,opt,name=chunk,proto3,oneof"`
-}
-
-func (*UpdateFileContentRequest_Chunk) isUpdateFileContentRequest_Data() {}
-
-type UpdateContentMetadata struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	Bucket        string                 `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateContentMetadata) Reset() {
-	*x = UpdateContentMetadata{}
-	mi := &file_services_file_repository_types_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateContentMetadata) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateContentMetadata) ProtoMessage() {}
-
-func (x *UpdateContentMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateContentMetadata.ProtoReflect.Descriptor instead.
-func (*UpdateContentMetadata) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *UpdateContentMetadata) GetPath() string {
-	if x != nil {
-		return x.Path
-	}
-	return ""
-}
-
-func (x *UpdateContentMetadata) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
-
-type UpdateFileMetadataRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Path          string                 `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	Bucket        string                 `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
-	NewMetadata   *types.FileMetadata    `protobuf:"bytes,3,opt,name=new_metadata,json=newMetadata,proto3" json:"new_metadata,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateFileMetadataRequest) Reset() {
-	*x = UpdateFileMetadataRequest{}
-	mi := &file_services_file_repository_types_proto_msgTypes[10]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateFileMetadataRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateFileMetadataRequest) ProtoMessage() {}
-
-func (x *UpdateFileMetadataRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[10]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateFileMetadataRequest.ProtoReflect.Descriptor instead.
-func (*UpdateFileMetadataRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *UpdateFileMetadataRequest) GetPath() string {
-	if x != nil {
-		return x.Path
-	}
-	return ""
-}
-
-func (x *UpdateFileMetadataRequest) GetBucket() string {
-	if x != nil {
-		return x.Bucket
-	}
-	return ""
-}
-
-func (x *UpdateFileMetadataRequest) GetNewMetadata() *types.FileMetadata {
-	if x != nil {
-		return x.NewMetadata
-	}
-	return nil
-}
-
 type DeleteFilesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Path          []string               `protobuf:"bytes,1,rep,name=path,proto3" json:"path,omitempty"`
@@ -672,7 +381,7 @@ type DeleteFilesRequest struct {
 
 func (x *DeleteFilesRequest) Reset() {
 	*x = DeleteFilesRequest{}
-	mi := &file_services_file_repository_types_proto_msgTypes[11]
+	mi := &file_services_file_repository_types_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -684,7 +393,7 @@ func (x *DeleteFilesRequest) String() string {
 func (*DeleteFilesRequest) ProtoMessage() {}
 
 func (x *DeleteFilesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[11]
+	mi := &file_services_file_repository_types_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -697,7 +406,7 @@ func (x *DeleteFilesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFilesRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFilesRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{11}
+	return file_services_file_repository_types_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteFilesRequest) GetPath() []string {
@@ -725,7 +434,7 @@ type FileChunk struct {
 
 func (x *FileChunk) Reset() {
 	*x = FileChunk{}
-	mi := &file_services_file_repository_types_proto_msgTypes[12]
+	mi := &file_services_file_repository_types_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -737,7 +446,7 @@ func (x *FileChunk) String() string {
 func (*FileChunk) ProtoMessage() {}
 
 func (x *FileChunk) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[12]
+	mi := &file_services_file_repository_types_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -750,7 +459,7 @@ func (x *FileChunk) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileChunk.ProtoReflect.Descriptor instead.
 func (*FileChunk) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{12}
+	return file_services_file_repository_types_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *FileChunk) GetContent() []byte {
@@ -784,7 +493,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_services_file_repository_types_proto_msgTypes[13]
+	mi := &file_services_file_repository_types_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -796,7 +505,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_repository_types_proto_msgTypes[13]
+	mi := &file_services_file_repository_types_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -809,7 +518,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_services_file_repository_types_proto_rawDescGZIP(), []int{13}
+	return file_services_file_repository_types_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *StatusResponse) GetStatus() int32 {
@@ -830,7 +539,7 @@ var File_services_file_repository_types_proto protoreflect.FileDescriptor
 
 const file_services_file_repository_types_proto_rawDesc = "" +
 	"\n" +
-	"$services/file-repository/types.proto\x12\x0ffile_repository\x1a\x10types/file.proto\".\n" +
+	"$services/file-repository/types.proto\x12\x0ffile_repository\".\n" +
 	"\x12HealthCheckRequest\x12\x18\n" +
 	"\aservice\x18\x01 \x01(\tR\aservice\"K\n" +
 	"\x13HealthCheckResponse\x12\x16\n" +
@@ -840,10 +549,7 @@ const file_services_file_repository_types_proto_rawDesc = "" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
 	"\x06bucket\x18\x02 \x01(\tR\x06bucket\x12\x1d\n" +
 	"\n" +
-	"chunk_size\x18\x03 \x01(\x05R\tchunkSize\"J\n" +
-	"\x1cGetFileMetadataByPathRequest\x12\x12\n" +
-	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
-	"\x06bucket\x18\x02 \x01(\tR\x06bucket\":\n" +
+	"chunk_size\x18\x03 \x01(\x05R\tchunkSize\":\n" +
 	"\fMkdirRequest\x12\x12\n" +
 	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
 	"\x06bucket\x18\x02 \x01(\tR\x06bucket\"S\n" +
@@ -854,21 +560,7 @@ const file_services_file_repository_types_proto_rawDesc = "" +
 	"\x12FileContentRequest\x12<\n" +
 	"\x06header\x18\x01 \x01(\v2\".file_repository.FileContentHeaderH\x00R\x06header\x12\x16\n" +
 	"\x05chunk\x18\x02 \x01(\fH\x00R\x05chunkB\x06\n" +
-	"\x04data\"w\n" +
-	"\x0eUploadMetadata\x129\n" +
-	"\rfile_metadata\x18\x01 \x01(\v2\x14.common.FileMetadataR\ffileMetadata\x12\x12\n" +
-	"\x04path\x18\x02 \x01(\tR\x04path\x12\x16\n" +
-	"\x06bucket\x18\x03 \x01(\tR\x06bucket\":\n" +
-	"\x18UpdateFileContentRequest\x12\x16\n" +
-	"\x05chunk\x18\x01 \x01(\fH\x00R\x05chunkB\x06\n" +
-	"\x04data\"C\n" +
-	"\x15UpdateContentMetadata\x12\x12\n" +
-	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
-	"\x06bucket\x18\x02 \x01(\tR\x06bucket\"\x80\x01\n" +
-	"\x19UpdateFileMetadataRequest\x12\x12\n" +
-	"\x04path\x18\x01 \x01(\tR\x04path\x12\x16\n" +
-	"\x06bucket\x18\x02 \x01(\tR\x06bucket\x127\n" +
-	"\fnew_metadata\x18\x03 \x01(\v2\x14.common.FileMetadataR\vnewMetadata\"@\n" +
+	"\x04data\"@\n" +
 	"\x12DeleteFilesRequest\x12\x12\n" +
 	"\x04path\x18\x01 \x03(\tR\x04path\x12\x16\n" +
 	"\x06bucket\x18\x02 \x01(\tR\x06bucket\"e\n" +
@@ -894,33 +586,25 @@ func file_services_file_repository_types_proto_rawDescGZIP() []byte {
 	return file_services_file_repository_types_proto_rawDescData
 }
 
-var file_services_file_repository_types_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_services_file_repository_types_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_services_file_repository_types_proto_goTypes = []any{
-	(*HealthCheckRequest)(nil),           // 0: file_repository.HealthCheckRequest
-	(*HealthCheckResponse)(nil),          // 1: file_repository.HealthCheckResponse
-	(*GetFileByPathRequest)(nil),         // 2: file_repository.GetFileByPathRequest
-	(*GetFileMetadataByPathRequest)(nil), // 3: file_repository.GetFileMetadataByPathRequest
-	(*MkdirRequest)(nil),                 // 4: file_repository.MkdirRequest
-	(*FileContentHeader)(nil),            // 5: file_repository.FileContentHeader
-	(*FileContentRequest)(nil),           // 6: file_repository.FileContentRequest
-	(*UploadMetadata)(nil),               // 7: file_repository.UploadMetadata
-	(*UpdateFileContentRequest)(nil),     // 8: file_repository.UpdateFileContentRequest
-	(*UpdateContentMetadata)(nil),        // 9: file_repository.UpdateContentMetadata
-	(*UpdateFileMetadataRequest)(nil),    // 10: file_repository.UpdateFileMetadataRequest
-	(*DeleteFilesRequest)(nil),           // 11: file_repository.DeleteFilesRequest
-	(*FileChunk)(nil),                    // 12: file_repository.FileChunk
-	(*StatusResponse)(nil),               // 13: file_repository.StatusResponse
-	(*types.FileMetadata)(nil),           // 14: common.FileMetadata
+	(*HealthCheckRequest)(nil),   // 0: file_repository.HealthCheckRequest
+	(*HealthCheckResponse)(nil),  // 1: file_repository.HealthCheckResponse
+	(*GetFileByPathRequest)(nil), // 2: file_repository.GetFileByPathRequest
+	(*MkdirRequest)(nil),         // 3: file_repository.MkdirRequest
+	(*FileContentHeader)(nil),    // 4: file_repository.FileContentHeader
+	(*FileContentRequest)(nil),   // 5: file_repository.FileContentRequest
+	(*DeleteFilesRequest)(nil),   // 6: file_repository.DeleteFilesRequest
+	(*FileChunk)(nil),            // 7: file_repository.FileChunk
+	(*StatusResponse)(nil),       // 8: file_repository.StatusResponse
 }
 var file_services_file_repository_types_proto_depIdxs = []int32{
-	5,  // 0: file_repository.FileContentRequest.header:type_name -> file_repository.FileContentHeader
-	14, // 1: file_repository.UploadMetadata.file_metadata:type_name -> common.FileMetadata
-	14, // 2: file_repository.UpdateFileMetadataRequest.new_metadata:type_name -> common.FileMetadata
-	3,  // [3:3] is the sub-list for method output_type
-	3,  // [3:3] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	4, // 0: file_repository.FileContentRequest.header:type_name -> file_repository.FileContentHeader
+	1, // [1:1] is the sub-list for method output_type
+	1, // [1:1] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_services_file_repository_types_proto_init() }
@@ -928,12 +612,9 @@ func file_services_file_repository_types_proto_init() {
 	if File_services_file_repository_types_proto != nil {
 		return
 	}
-	file_services_file_repository_types_proto_msgTypes[6].OneofWrappers = []any{
+	file_services_file_repository_types_proto_msgTypes[5].OneofWrappers = []any{
 		(*FileContentRequest_Header)(nil),
 		(*FileContentRequest_Chunk)(nil),
-	}
-	file_services_file_repository_types_proto_msgTypes[8].OneofWrappers = []any{
-		(*UpdateFileContentRequest_Chunk)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
@@ -941,7 +622,7 @@ func file_services_file_repository_types_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_services_file_repository_types_proto_rawDesc), len(file_services_file_repository_types_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

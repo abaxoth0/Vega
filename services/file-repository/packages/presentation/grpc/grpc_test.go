@@ -196,4 +196,52 @@ func TestRPC(t *testing.T) {
 			}
 		})
 	})
+	t.Run("UploadFile()", func(t *testing.T) {
+		withClient(t, func(client file_repository.FileRepositoryServiceClient) {
+			newFileContent := []byte("new file content")
+
+			context, cancel := newRPCContext()
+			defer cancel()
+
+			stream, err := client.UpdateFileContent(context)
+			if err != nil {
+				t.Fatalf("UpdateFileContent() RPC failed: %v", err)
+			}
+			err = stream.Send(&file_repository.FileContentRequest{
+				Data: &file_repository.FileContentRequest_Header{
+					Header: &file_repository.FileContentHeader{
+						Path: fmt.Sprintf("/upload-file-test-%s", time.Now().Format(time.RFC3339)),
+						Bucket: testBucket,
+						Size: int64(len(newFileContent)),
+					},
+				},
+			})
+			if err != nil {
+				t.Fatalf("Failed to send header")
+			}
+
+			err = stream.Send(&file_repository.FileContentRequest{
+				Data: &file_repository.FileContentRequest_Chunk{
+					Chunk: newFileContent,
+				},
+			})
+			if err != nil {
+				t.Fatalf("Faield to send chunk")
+			}
+
+			err = stream.CloseSend()
+			if err != nil {
+				t.Fatalf("Faield to close send stream: %v", err)
+			}
+
+			resp, err := stream.Recv()
+			if err != nil {
+				t.Fatalf("Failed to receive response: %v", err)
+			}
+
+			if resp.Status != http.StatusOK {
+				t.Fatalf("Server reported upload failure")
+			}
+		})
+	})
 }

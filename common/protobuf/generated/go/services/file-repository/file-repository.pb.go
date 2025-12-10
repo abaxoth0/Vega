@@ -24,40 +24,39 @@ var File_services_file_repository_file_repository_proto protoreflect.FileDescrip
 
 const file_services_file_repository_file_repository_proto_rawDesc = "" +
 	"\n" +
-	".services/file-repository/file-repository.proto\x12\x0ffile_repository\x1a$services/file-repository/types.proto2\xa2\x04\n" +
+	".services/file-repository/file-repository.proto\x12\x0ffile_repository\x1a$services/file-repository/types.proto2\x9c\x04\n" +
 	"\x15FileRepositoryService\x12X\n" +
 	"\vHealthCheck\x12#.file_repository.HealthCheckRequest\x1a$.file_repository.HealthCheckResponse\x12T\n" +
 	"\rGetFileByPath\x12%.file_repository.GetFileByPathRequest\x1a\x1a.file_repository.FileChunk0\x01\x12G\n" +
 	"\x05Mkdir\x12\x1d.file_repository.MkdirRequest\x1a\x1f.file_repository.StatusResponse\x12V\n" +
 	"\n" +
-	"UploadFile\x12#.file_repository.FileContentRequest\x1a\x1f.file_repository.StatusResponse(\x010\x01\x12c\n" +
-	"\x11UpdateFileContent\x12).file_repository.UpdateFileContentRequest\x1a\x1f.file_repository.StatusResponse(\x010\x01\x12S\n" +
+	"UploadFile\x12#.file_repository.FileContentRequest\x1a\x1f.file_repository.StatusResponse(\x010\x01\x12]\n" +
+	"\x11UpdateFileContent\x12#.file_repository.FileContentRequest\x1a\x1f.file_repository.StatusResponse(\x010\x01\x12S\n" +
 	"\vDeleteFiles\x12#.file_repository.DeleteFilesRequest\x1a\x1f.file_repository.StatusResponseBPZNgithub.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repositoryb\x06proto3"
 
 var file_services_file_repository_file_repository_proto_goTypes = []any{
-	(*HealthCheckRequest)(nil),       // 0: file_repository.HealthCheckRequest
-	(*GetFileByPathRequest)(nil),     // 1: file_repository.GetFileByPathRequest
-	(*MkdirRequest)(nil),             // 2: file_repository.MkdirRequest
-	(*FileContentRequest)(nil),       // 3: file_repository.FileContentRequest
-	(*UpdateFileContentRequest)(nil), // 4: file_repository.UpdateFileContentRequest
-	(*DeleteFilesRequest)(nil),       // 5: file_repository.DeleteFilesRequest
-	(*HealthCheckResponse)(nil),      // 6: file_repository.HealthCheckResponse
-	(*FileChunk)(nil),                // 7: file_repository.FileChunk
-	(*StatusResponse)(nil),           // 8: file_repository.StatusResponse
+	(*HealthCheckRequest)(nil),   // 0: file_repository.HealthCheckRequest
+	(*GetFileByPathRequest)(nil), // 1: file_repository.GetFileByPathRequest
+	(*MkdirRequest)(nil),         // 2: file_repository.MkdirRequest
+	(*FileContentRequest)(nil),   // 3: file_repository.FileContentRequest
+	(*DeleteFilesRequest)(nil),   // 4: file_repository.DeleteFilesRequest
+	(*HealthCheckResponse)(nil),  // 5: file_repository.HealthCheckResponse
+	(*FileChunk)(nil),            // 6: file_repository.FileChunk
+	(*StatusResponse)(nil),       // 7: file_repository.StatusResponse
 }
 var file_services_file_repository_file_repository_proto_depIdxs = []int32{
 	0, // 0: file_repository.FileRepositoryService.HealthCheck:input_type -> file_repository.HealthCheckRequest
 	1, // 1: file_repository.FileRepositoryService.GetFileByPath:input_type -> file_repository.GetFileByPathRequest
 	2, // 2: file_repository.FileRepositoryService.Mkdir:input_type -> file_repository.MkdirRequest
 	3, // 3: file_repository.FileRepositoryService.UploadFile:input_type -> file_repository.FileContentRequest
-	4, // 4: file_repository.FileRepositoryService.UpdateFileContent:input_type -> file_repository.UpdateFileContentRequest
-	5, // 5: file_repository.FileRepositoryService.DeleteFiles:input_type -> file_repository.DeleteFilesRequest
-	6, // 6: file_repository.FileRepositoryService.HealthCheck:output_type -> file_repository.HealthCheckResponse
-	7, // 7: file_repository.FileRepositoryService.GetFileByPath:output_type -> file_repository.FileChunk
-	8, // 8: file_repository.FileRepositoryService.Mkdir:output_type -> file_repository.StatusResponse
-	8, // 9: file_repository.FileRepositoryService.UploadFile:output_type -> file_repository.StatusResponse
-	8, // 10: file_repository.FileRepositoryService.UpdateFileContent:output_type -> file_repository.StatusResponse
-	8, // 11: file_repository.FileRepositoryService.DeleteFiles:output_type -> file_repository.StatusResponse
+	3, // 4: file_repository.FileRepositoryService.UpdateFileContent:input_type -> file_repository.FileContentRequest
+	4, // 5: file_repository.FileRepositoryService.DeleteFiles:input_type -> file_repository.DeleteFilesRequest
+	5, // 6: file_repository.FileRepositoryService.HealthCheck:output_type -> file_repository.HealthCheckResponse
+	6, // 7: file_repository.FileRepositoryService.GetFileByPath:output_type -> file_repository.FileChunk
+	7, // 8: file_repository.FileRepositoryService.Mkdir:output_type -> file_repository.StatusResponse
+	7, // 9: file_repository.FileRepositoryService.UploadFile:output_type -> file_repository.StatusResponse
+	7, // 10: file_repository.FileRepositoryService.UpdateFileContent:output_type -> file_repository.StatusResponse
+	7, // 11: file_repository.FileRepositoryService.DeleteFiles:output_type -> file_repository.StatusResponse
 	6, // [6:12] is the sub-list for method output_type
 	0, // [0:6] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name

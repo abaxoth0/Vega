@@ -4,8 +4,6 @@ package file_repository;
 
 option go_package = "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository";
 
-import "types/file.proto";
-
 message HealthCheckRequest {
   string service = 1;
 }
@@ -19,11 +17,6 @@ message GetFileByPathRequest {
   string path = 1;
   string bucket = 2;
   int32 chunk_size = 3;
-}
-
-message GetFileMetadataByPathRequest {
-  string path = 1;
-  string bucket = 2;
 }
 
 message MkdirRequest {
@@ -43,30 +36,6 @@ message FileContentRequest {
     bytes  chunk = 2;
   }
 }
-
-message UploadMetadata {
-  common.FileMetadata file_metadata = 1;
-  string path = 2;
-  string bucket = 3;
-}
-
-message UpdateFileContentRequest {
-  oneof data {
-    bytes chunk = 1;
-  }
-}
-
-message UpdateContentMetadata {
-  string path = 1;
-  string bucket = 2;
-}
-
-message UpdateFileMetadataRequest {
-  string path = 1;
-  string bucket = 2;
-  common.FileMetadata new_metadata = 3;
-}
-
 message DeleteFilesRequest {
   repeated string path = 1;
   string bucket = 2;

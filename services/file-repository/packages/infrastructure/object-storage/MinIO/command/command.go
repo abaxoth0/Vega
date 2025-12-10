@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"strconv"
 	"strings"
 	"vega/packages/application"
@@ -97,14 +98,17 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 	return nil
 }
 
-func (h *defaultCommandHandler) fullReplace(ctx context.Context, bucket string, path string, content []byte) error {
-	size := int64(len(content))
-
-	_, err := storage.Client.PutObject(ctx, bucket, path, bytes.NewReader(content), size, minio.PutObjectOptions{})
+func (h *defaultCommandHandler) fullReplace(
+	ctx context.Context,
+	bucket string,
+	path string,
+	content io.Reader,
+	size int64,
+) error {
+	_, err := storage.Client.PutObject(ctx, bucket, path, content, size, minio.PutObjectOptions{})
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -116,7 +120,16 @@ func (h *defaultCommandHandler) UpdateFileContent(cmd *FileApplication.UpdateFil
 	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
 	defer cancel()
 
-	if err := h.fullReplace(ctx, cmd.Bucket, cmd.Path, cmd.NewContent); err != nil {
+	// Alas, S3-compatibale object storages (including MinIO) doesn't supports partial objects updates
+	// Reason is kinda obvious - complexity.
+	// Need to calculate deltas and apply them correctly... althogh it may sound not very hard/complex,
+	// in fact - it is. The most important part here is to guarantee consistency, so atomic operations
+	// with full content replacement are more reliable in comparison.
+	// And usually partial updates are more needed in very specific scenarios - like
+	// remote document editing. But this documents aren't really big in most cases, few MB maybe.
+	// And fully updating them won't be problematic, althogh it will create more pressure on network
+	// traffic and disk I/O, but for consistency - it's reasonable tradeoff.
+	if err := h.fullReplace(ctx, cmd.Bucket, cmd.Path, cmd.NewContent, cmd.Size); err != nil {
 		return err
 	}
 

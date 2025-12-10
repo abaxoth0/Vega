@@ -37,7 +37,7 @@ type FileRepositoryServiceClient interface {
 	// Commands
 	Mkdir(ctx context.Context, in *MkdirRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	UploadFile(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[FileContentRequest, StatusResponse], error)
-	UpdateFileContent(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[UpdateFileContentRequest, StatusResponse], error)
+	UpdateFileContent(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[FileContentRequest, StatusResponse], error)
 	DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 }
 
@@ -101,18 +101,18 @@ func (c *fileRepositoryServiceClient) UploadFile(ctx context.Context, opts ...gr
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type FileRepositoryService_UploadFileClient = grpc.BidiStreamingClient[FileContentRequest, StatusResponse]
 
-func (c *fileRepositoryServiceClient) UpdateFileContent(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[UpdateFileContentRequest, StatusResponse], error) {
+func (c *fileRepositoryServiceClient) UpdateFileContent(ctx context.Context, opts ...grpc.CallOption) (grpc.BidiStreamingClient[FileContentRequest, StatusResponse], error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	stream, err := c.cc.NewStream(ctx, &FileRepositoryService_ServiceDesc.Streams[2], FileRepositoryService_UpdateFileContent_FullMethodName, cOpts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &grpc.GenericClientStream[UpdateFileContentRequest, StatusResponse]{ClientStream: stream}
+	x := &grpc.GenericClientStream[FileContentRequest, StatusResponse]{ClientStream: stream}
 	return x, nil
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type FileRepositoryService_UpdateFileContentClient = grpc.BidiStreamingClient[UpdateFileContentRequest, StatusResponse]
+type FileRepositoryService_UpdateFileContentClient = grpc.BidiStreamingClient[FileContentRequest, StatusResponse]
 
 func (c *fileRepositoryServiceClient) DeleteFiles(ctx context.Context, in *DeleteFilesRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
@@ -134,7 +134,7 @@ type FileRepositoryServiceServer interface {
 	// Commands
 	Mkdir(context.Context, *MkdirRequest) (*StatusResponse, error)
 	UploadFile(grpc.BidiStreamingServer[FileContentRequest, StatusResponse]) error
-	UpdateFileContent(grpc.BidiStreamingServer[UpdateFileContentRequest, StatusResponse]) error
+	UpdateFileContent(grpc.BidiStreamingServer[FileContentRequest, StatusResponse]) error
 	DeleteFiles(context.Context, *DeleteFilesRequest) (*StatusResponse, error)
 	mustEmbedUnimplementedFileRepositoryServiceServer()
 }
@@ -158,7 +158,7 @@ func (UnimplementedFileRepositoryServiceServer) Mkdir(context.Context, *MkdirReq
 func (UnimplementedFileRepositoryServiceServer) UploadFile(grpc.BidiStreamingServer[FileContentRequest, StatusResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
 }
-func (UnimplementedFileRepositoryServiceServer) UpdateFileContent(grpc.BidiStreamingServer[UpdateFileContentRequest, StatusResponse]) error {
+func (UnimplementedFileRepositoryServiceServer) UpdateFileContent(grpc.BidiStreamingServer[FileContentRequest, StatusResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method UpdateFileContent not implemented")
 }
 func (UnimplementedFileRepositoryServiceServer) DeleteFiles(context.Context, *DeleteFilesRequest) (*StatusResponse, error) {
@@ -240,11 +240,11 @@ func _FileRepositoryService_UploadFile_Handler(srv interface{}, stream grpc.Serv
 type FileRepositoryService_UploadFileServer = grpc.BidiStreamingServer[FileContentRequest, StatusResponse]
 
 func _FileRepositoryService_UpdateFileContent_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(FileRepositoryServiceServer).UpdateFileContent(&grpc.GenericServerStream[UpdateFileContentRequest, StatusResponse]{ServerStream: stream})
+	return srv.(FileRepositoryServiceServer).UpdateFileContent(&grpc.GenericServerStream[FileContentRequest, StatusResponse]{ServerStream: stream})
 }
 
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
-type FileRepositoryService_UpdateFileContentServer = grpc.BidiStreamingServer[UpdateFileContentRequest, StatusResponse]
+type FileRepositoryService_UpdateFileContentServer = grpc.BidiStreamingServer[FileContentRequest, StatusResponse]
 
 func _FileRepositoryService_DeleteFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteFilesRequest)
