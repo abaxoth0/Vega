@@ -6,12 +6,14 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 	objectstorage "vega/packages/infrastructure/object-storage"
 	storageconnection "vega/packages/infrastructure/object-storage/connection"
 
 	file_repository "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository"
+	errs "github.com/abaxoth0/Vega/libs/go/packages/erorrs"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -148,11 +150,14 @@ func TestRPC(t *testing.T) {
 		})
 	})
 
+	testFilePath := fmt.Sprintf("/upload-file-test-%s", time.Now().Format(time.RFC3339))
+
 	t.Run("UploadFile()", func(t *testing.T) {
 		withClient(t, func(client file_repository.FileRepositoryServiceClient) {
 			fileContent := []byte("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.")
 
-			if err := testFileStream(client.UploadFile, testBucket, fileContent); err != nil {
+			err := testFileStream(client.UploadFile, testBucket, testFilePath, fileContent)
+			if err != nil {
 				t.Fatalf("UpdateFileContent() RPC failed: %v", err)
 			}
 		})
@@ -160,10 +165,40 @@ func TestRPC(t *testing.T) {
 
 	t.Run("UpdateFileContent()", func(t *testing.T) {
 		withClient(t, func(client file_repository.FileRepositoryServiceClient) {
-			err := testFileStream(client.UpdateFileContent, testBucket, []byte("new file content"))
-
+			err := testFileStream(
+				client.UpdateFileContent,
+				testBucket,
+				testFilePath,
+				[]byte("new file content"),
+			)
 			if err != nil {
 				t.Fatalf("UpdateFileContent() RPC failed: %v", err)
+			}
+		})
+	})
+
+	t.Run("DeleteFiles()", func(t *testing.T) {
+		withClient(t, func(client file_repository.FileRepositoryServiceClient) {
+			ctx, cancel := newRPCContext()
+			defer cancel()
+
+			client.DeleteFiles(ctx, &file_repository.DeleteFilesRequest{
+				Bucket: testBucket,
+				Paths: []string{testFilePath},
+			})
+			if err != nil {
+				t.Fatalf("DeleteFiles() RPC failed: %v", err)
+			}
+			stream, err := client.GetFileByPath(ctx, &file_repository.GetFileByPathRequest{
+				Bucket: testBucket,
+				Path: testFilePath,
+			})
+			if err != nil {
+				t.Fatalf("Failed to check if file was deleted: %v", err)
+			}
+			_, err = stream.Recv()
+			if !strings.Contains(err.Error(), errs.StatusNotFound.Error()) {
+				t.Fatalf("Failed to check if file was deleted: %v", err)
 			}
 		})
 	})
@@ -174,7 +209,7 @@ type fileStreamFunc = func (ctx context.Context, opts ...grpc.CallOption) (
 	error,
 )
 
-func testFileStream(streamFunc fileStreamFunc, bucket string, content []byte) error {
+func testFileStream(streamFunc fileStreamFunc, bucket string, filePath string, content []byte) error {
 	context, cancel := newRPCContext()
 	defer cancel()
 
@@ -186,7 +221,7 @@ func testFileStream(streamFunc fileStreamFunc, bucket string, content []byte) er
 	err = stream.Send(&file_repository.FileContentRequest{
 		Data: &file_repository.FileContentRequest_Header{
 			Header: &file_repository.FileContentHeader{
-				Path: fmt.Sprintf("/upload-file-test-%s", time.Now().Format(time.RFC3339)),
+				Path: filePath,
 				Bucket: bucket,
 				Size: int64(len(content)),
 			},

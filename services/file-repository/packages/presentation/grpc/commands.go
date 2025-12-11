@@ -127,8 +127,17 @@ func (s *Server) UpdateFileContent(
 }
 
 func (s *Server) DeleteFiles(
-	context.Context,
-	*file_repository.DeleteFilesRequest,
+	ctx context.Context,
+	req *file_repository.DeleteFilesRequest,
 ) (*file_repository.StatusResponse, error) {
-	panic("DeleteFiles() is not implemented")
+	err := s.storage.DeleteFiles(&fileapplication.DeleteFilesCommand{
+		Bucket: req.GetBucket(),
+		Paths: req.GetPaths(),
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &file_repository.StatusResponse{
+		Status: http.StatusOK,
+	}, nil
 }

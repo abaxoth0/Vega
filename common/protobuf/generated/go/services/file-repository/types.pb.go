@@ -373,7 +373,7 @@ func (*FileContentRequest_Chunk) isFileContentRequest_Data() {}
 
 type DeleteFilesRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Path          []string               `protobuf:"bytes,1,rep,name=path,proto3" json:"path,omitempty"`
+	Paths         []string               `protobuf:"bytes,1,rep,name=paths,proto3" json:"paths,omitempty"`
 	Bucket        string                 `protobuf:"bytes,2,opt,name=bucket,proto3" json:"bucket,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -409,9 +409,9 @@ func (*DeleteFilesRequest) Descriptor() ([]byte, []int) {
 	return file_services_file_repository_types_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *DeleteFilesRequest) GetPath() []string {
+func (x *DeleteFilesRequest) GetPaths() []string {
 	if x != nil {
-		return x.Path
+		return x.Paths
 	}
 	return nil
 }
@@ -560,9 +560,9 @@ const file_services_file_repository_types_proto_rawDesc = "" +
 	"\x12FileContentRequest\x12<\n" +
 	"\x06header\x18\x01 \x01(\v2\".file_repository.FileContentHeaderH\x00R\x06header\x12\x16\n" +
 	"\x05chunk\x18\x02 \x01(\fH\x00R\x05chunkB\x06\n" +
-	"\x04data\"@\n" +
-	"\x12DeleteFilesRequest\x12\x12\n" +
-	"\x04path\x18\x01 \x03(\tR\x04path\x12\x16\n" +
+	"\x04data\"B\n" +
+	"\x12DeleteFilesRequest\x12\x14\n" +
+	"\x05paths\x18\x01 \x03(\tR\x05paths\x12\x16\n" +
 	"\x06bucket\x18\x02 \x01(\tR\x06bucket\"e\n" +
 	"\tFileChunk\x12\x18\n" +
 	"\acontent\x18\x01 \x01(\fR\acontent\x12\x1f\n" +

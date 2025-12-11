@@ -9,6 +9,7 @@ import (
 	MinIOCommon "vega/packages/infrastructure/object-storage/MinIO/common"
 	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
 
+	errs "github.com/abaxoth0/Vega/libs/go/packages/erorrs"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -48,10 +49,20 @@ func (h *defaultQueryHandler) GetFileByPath(query *FileApplication.GetFileByPath
 
 	object, err := storage.Client.GetObject(ctx, query.Bucket, query.Path, minio.GetObjectOptions{})
 	if err != nil {
+		if err, ok := err.(minio.ErrorResponse); ok {
+			if err.Code == minio.NoSuchKey {
+				return nil, errs.StatusNotFound
+			}
+		}
 		return nil, err
 	}
 	stat, err := object.Stat()
 	if err != nil {
+		if err, ok := err.(minio.ErrorResponse); ok {
+			if err.Code == minio.NoSuchKey {
+				return nil, errs.StatusNotFound
+			}
+		}
 		return nil, err
 	}
 

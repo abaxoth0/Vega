@@ -27,3 +27,7 @@ var StatusInternalServerError = NewStatusError(
 	http.StatusInternalServerError,
 )
 
+var StatusNotFound = NewStatusError(
+	"Requested Resource Wasn't Found",
+	http.StatusNotFound,
+)

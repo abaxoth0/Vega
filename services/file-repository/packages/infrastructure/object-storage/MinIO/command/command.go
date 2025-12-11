@@ -145,7 +145,6 @@ func (h *defaultCommandHandler) UpdateFileContent(cmd *FileApplication.UpdateFil
 //
 // TODO (FEAT): Implement recursive deletion for directories
 func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesCommand) error {
-
 	if !cmd.CommandQuery.IsInit() {
 		application.InitDefaultCommandQuery(&cmd.CommandQuery)
 	}

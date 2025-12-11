@@ -37,7 +37,7 @@ message FileContentRequest {
   }
 }
 message DeleteFilesRequest {
-  repeated string path = 1;
+  repeated string paths = 1;
   string bucket = 2;
 }
 
