@@ -3,7 +3,7 @@ package miniocommon
 import (
 	"context"
 	"errors"
-	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
+	MinIOConnection "vega_file_repository/packages/infrastructure/object-storage/MinIO/connection"
 )
 
 var storage = MinIOConnection.Manager

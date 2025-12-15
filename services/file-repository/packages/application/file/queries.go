@@ -2,7 +2,7 @@ package fileapplication
 
 import (
 	"errors"
-	"vega/packages/application"
+	"vega_file_repository/packages/application"
 )
 
 var (

@@ -2,7 +2,7 @@ package fileapplication
 
 import (
 	"io"
-	"vega/packages/application"
+	"vega_file_repository/packages/application"
 )
 
 type MkdirCommand struct {

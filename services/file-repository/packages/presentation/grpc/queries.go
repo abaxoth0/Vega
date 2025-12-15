@@ -3,7 +3,7 @@ package grpc
 import (
 	"io"
 	"log"
-	FileApplication "vega/packages/application/file"
+	FileApplication "vega_file_repository/packages/application/file"
 
 	file_repository "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository"
 	"google.golang.org/grpc"

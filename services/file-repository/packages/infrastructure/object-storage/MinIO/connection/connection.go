@@ -3,7 +3,7 @@ package minioconnection
 import (
 	"context"
 	"time"
-	StorageConnection "vega/packages/infrastructure/object-storage/connection"
+	StorageConnection "vega_file_repository/packages/infrastructure/object-storage/connection"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"

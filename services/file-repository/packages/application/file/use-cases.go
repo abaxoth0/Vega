@@ -1,7 +1,7 @@
 package fileapplication
 
 import (
-	"vega/packages/domain/entity"
+	"vega_file_repository/packages/domain/entity"
 )
 
 type UseCases interface {

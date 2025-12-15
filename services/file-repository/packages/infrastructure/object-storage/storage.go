@@ -1,9 +1,9 @@
 package objectstorage
 
 import (
-	FileApplication "vega/packages/application/file"
-	minio "vega/packages/infrastructure/object-storage/MinIO"
-	StorageConnection "vega/packages/infrastructure/object-storage/connection"
+	FileApplication "vega_file_repository/packages/application/file"
+	minio "vega_file_repository/packages/infrastructure/object-storage/MinIO"
+	StorageConnection "vega_file_repository/packages/infrastructure/object-storage/connection"
 )
 
 type ObjectStorageDriver interface {

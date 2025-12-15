@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	fileapplication "vega/packages/application/file"
+	fileapplication "vega_file_repository/packages/application/file"
 
 	file_repository "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository"
 	"google.golang.org/grpc"

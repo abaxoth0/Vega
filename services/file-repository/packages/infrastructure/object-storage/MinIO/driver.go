@@ -1,11 +1,11 @@
 package minio
 
 import (
-	FileApplication "vega/packages/application/file"
-	MinIOCommand "vega/packages/infrastructure/object-storage/MinIO/command"
-	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
-	MinIOQuery "vega/packages/infrastructure/object-storage/MinIO/query"
-	StorageConnection "vega/packages/infrastructure/object-storage/connection"
+	FileApplication "vega_file_repository/packages/application/file"
+	MinIOCommand "vega_file_repository/packages/infrastructure/object-storage/MinIO/command"
+	MinIOConnection "vega_file_repository/packages/infrastructure/object-storage/MinIO/connection"
+	MinIOQuery "vega_file_repository/packages/infrastructure/object-storage/MinIO/query"
+	StorageConnection "vega_file_repository/packages/infrastructure/object-storage/connection"
 )
 
 type Driver struct {

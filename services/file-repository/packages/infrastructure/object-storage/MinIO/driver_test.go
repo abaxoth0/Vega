@@ -8,8 +8,8 @@ import (
 	"sync"
 	"testing"
 	"time"
-	FileApplication "vega/packages/application/file"
-	StorageConnection "vega/packages/infrastructure/object-storage/connection"
+	FileApplication "vega_file_repository/packages/application/file"
+	StorageConnection "vega_file_repository/packages/infrastructure/object-storage/connection"
 )
 
 func connect(driver *Driver) error {

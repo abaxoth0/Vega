@@ -7,7 +7,7 @@ import (
 	"net"
 	"strconv"
 	"time"
-	objectstorage "vega/packages/infrastructure/object-storage"
+	objectstorage "vega_file_repository/packages/infrastructure/object-storage"
 
 	file_repository "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository"
 	"google.golang.org/grpc"

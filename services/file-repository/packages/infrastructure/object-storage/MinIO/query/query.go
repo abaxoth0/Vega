@@ -3,11 +3,11 @@ package minioquery
 import (
 	"context"
 	"errors"
-	"vega/packages/application"
-	FileApplication "vega/packages/application/file"
-	"vega/packages/domain/entity"
-	MinIOCommon "vega/packages/infrastructure/object-storage/MinIO/common"
-	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
+	"vega_file_repository/packages/application"
+	FileApplication "vega_file_repository/packages/application/file"
+	"vega_file_repository/packages/domain/entity"
+	MinIOCommon "vega_file_repository/packages/infrastructure/object-storage/MinIO/common"
+	MinIOConnection "vega_file_repository/packages/infrastructure/object-storage/MinIO/connection"
 
 	errs "github.com/abaxoth0/Vega/libs/go/packages/erorrs"
 	"github.com/minio/minio-go/v7"

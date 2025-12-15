@@ -8,10 +8,10 @@ import (
 	"io"
 	"strconv"
 	"strings"
-	"vega/packages/application"
-	FileApplication "vega/packages/application/file"
-	MinIOCommon "vega/packages/infrastructure/object-storage/MinIO/common"
-	MinIOConnection "vega/packages/infrastructure/object-storage/MinIO/connection"
+	"vega_file_repository/packages/application"
+	FileApplication "vega_file_repository/packages/application/file"
+	MinIOCommon "vega_file_repository/packages/infrastructure/object-storage/MinIO/common"
+	MinIOConnection "vega_file_repository/packages/infrastructure/object-storage/MinIO/connection"
 
 	"github.com/minio/minio-go/v7"
 )

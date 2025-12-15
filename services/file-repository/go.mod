@@ -1,4 +1,4 @@
-module vega
+module vega_file_repository
 
 go 1.23.0
 

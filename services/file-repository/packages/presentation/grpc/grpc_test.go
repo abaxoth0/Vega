@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 	"time"
-	objectstorage "vega/packages/infrastructure/object-storage"
-	storageconnection "vega/packages/infrastructure/object-storage/connection"
+	objectstorage "vega_file_repository/packages/infrastructure/object-storage"
+	storageconnection "vega_file_repository/packages/infrastructure/object-storage/connection"
 
 	file_repository "github.com/abaxoth0/Vega/common/protobuf/generated/go/services/file-repository"
 	errs "github.com/abaxoth0/Vega/libs/go/packages/erorrs"
