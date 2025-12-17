@@ -2,7 +2,8 @@ package fileapplication
 
 import (
 	"errors"
-	"vega_file_repository/packages/application"
+
+	cqrs "github.com/abaxoth0/Vega/libs/go/packages/CQRS"
 )
 
 var (
@@ -14,5 +15,5 @@ type GetFileByPathQuery struct {
 	Bucket string
 	Path   string
 
-	application.CommandQuery
+	cqrs.CommandQuery
 }

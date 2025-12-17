@@ -3,12 +3,12 @@ package minioquery
 import (
 	"context"
 	"errors"
-	"vega_file_repository/packages/application"
 	FileApplication "vega_file_repository/packages/application/file"
 	"vega_file_repository/packages/domain/entity"
 	MinIOCommon "vega_file_repository/packages/infrastructure/object-storage/MinIO/common"
 	MinIOConnection "vega_file_repository/packages/infrastructure/object-storage/MinIO/connection"
 
+	cqrs "github.com/abaxoth0/Vega/libs/go/packages/CQRS"
 	errs "github.com/abaxoth0/Vega/libs/go/packages/erorrs"
 	"github.com/minio/minio-go/v7"
 )
@@ -19,9 +19,9 @@ var storage = MinIOConnection.Manager
 type defaultQueryHandler struct {
 }
 
-func (h *defaultQueryHandler) preprocessQuery(commandQuery *application.CommandQuery, path string) error {
+func (h *defaultQueryHandler) preprocessQuery(commandQuery *cqrs.CommandQuery, path string) error {
 	if !commandQuery.IsInit() {
-		application.InitDefaultCommandQuery(commandQuery)
+		cqrs.InitDefaultCommandQuery(commandQuery)
 	}
 
 	err := FileApplication.ValidatePathFormat(path)

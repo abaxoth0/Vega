@@ -8,11 +8,11 @@ import (
 	"io"
 	"strconv"
 	"strings"
-	"vega_file_repository/packages/application"
 	FileApplication "vega_file_repository/packages/application/file"
 	MinIOCommon "vega_file_repository/packages/infrastructure/object-storage/MinIO/common"
 	MinIOConnection "vega_file_repository/packages/infrastructure/object-storage/MinIO/connection"
 
+	"github.com/abaxoth0/Vega/libs/go/packages/CQRS"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -24,10 +24,10 @@ type defaultCommandHandler struct {
 var storage = MinIOConnection.Manager
 
 func (h *defaultCommandHandler) preprocessTargetedCommandQuery(
-	commandQuery *application.CommandQuery, path string,
+	commandQuery *cqrs.CommandQuery, path string,
 ) error {
 	if !commandQuery.IsInit() {
-		application.InitDefaultCommandQuery(commandQuery)
+		cqrs.InitDefaultCommandQuery(commandQuery)
 	}
 	if err := FileApplication.ValidatePathFormat(path); err != nil {
 		return err
@@ -36,10 +36,10 @@ func (h *defaultCommandHandler) preprocessTargetedCommandQuery(
 }
 
 func (h *defaultCommandHandler) preprocessCommandQuery(
-	commandQuery *application.CommandQuery,
+	commandQuery *cqrs.CommandQuery,
 ) (context.Context, context.CancelFunc) {
 	if !commandQuery.IsInit() {
-		application.InitDefaultCommandQuery(commandQuery)
+		cqrs.InitDefaultCommandQuery(commandQuery)
 	}
 
 	ctx, cancel := context.WithTimeout(commandQuery.Context, commandQuery.ContextTimeout)
@@ -146,7 +146,7 @@ func (h *defaultCommandHandler) UpdateFileContent(cmd *FileApplication.UpdateFil
 // TODO (FEAT): Implement recursive deletion for directories
 func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesCommand) error {
 	if !cmd.CommandQuery.IsInit() {
-		application.InitDefaultCommandQuery(&cmd.CommandQuery)
+		cqrs.InitDefaultCommandQuery(&cmd.CommandQuery)
 	}
 
 	for _, path := range cmd.Paths {

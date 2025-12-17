@@ -1,0 +1,23 @@
+package fileapplication
+
+import (
+	"vega_file_discovery/packages/entity"
+
+	cqrs "github.com/abaxoth0/Vega/libs/go/packages/CQRS"
+)
+
+type UseCases interface {
+	QueryHandler
+	CommandHandler
+}
+
+type QueryHandler interface {
+	GetFileMetadataByID(query *cqrs.IdTargetedCommandQuery) (*entity.FileMetadata, error)
+}
+
+type CommandHandler interface {
+	CreateFileMetadata(cmd *CreateFileMetadataCmd) (*entity.FileMetadata, error)
+	UpdateFileMetadata(cmd *UpdateFileMetadataCmd) (*entity.FileMetadata, error)
+	SoftDeleteFileMetadata(cmd *cqrs.IdTargetedCommandQuery) (*entity.FileMetadata, error)
+	HardDeleteFileMetadata(cmd *cqrs.IdTargetedCommandQuery) (*entity.FileMetadata, error)
+}

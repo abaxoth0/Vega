@@ -5,10 +5,6 @@ import (
 	"io"
 )
 
-const (
-	SmallFileSizeThreshold = 10 * 1024 * 1024 // 10 MB
-)
-
 type FileStream struct {
 	Content io.Reader
 	Size    int64

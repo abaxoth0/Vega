@@ -2,14 +2,15 @@ package fileapplication
 
 import (
 	"io"
-	"vega_file_repository/packages/application"
+
+	"github.com/abaxoth0/Vega/libs/go/packages/CQRS"
 )
 
 type MkdirCommand struct {
 	Bucket string
 	Path   string
 
-	application.CommandQuery
+	cqrs.CommandQuery
 }
 
 type UploadFileCommand struct {
@@ -18,7 +19,7 @@ type UploadFileCommand struct {
 	Path        string
 	Bucket      string
 
-	application.CommandQuery
+	cqrs.CommandQuery
 }
 
 type UpdateFileContentCommand struct {
@@ -27,25 +28,25 @@ type UpdateFileContentCommand struct {
 	NewContent io.Reader
 	Size	   int64
 
-	application.CommandQuery
+	cqrs.CommandQuery
 }
 
 type DeleteFilesCommand struct {
 	Paths  []string
 	Bucket string
 
-	application.CommandQuery
+	cqrs.CommandQuery
 }
 
 type MakeBucketCommand struct {
 	Name string
 
-	application.CommandQuery
+	cqrs.CommandQuery
 }
 
 type DeleteBucketCommand struct {
 	Name  string
 	Force bool
 
-	application.CommandQuery
+	cqrs.CommandQuery
 }
