@@ -4,5 +4,6 @@ use (
 	./common/protobuf
 	./libs/go
 	./playground
+	./services/file-discovery
 	./services/file-repository
 )
