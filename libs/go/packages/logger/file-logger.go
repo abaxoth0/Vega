@@ -28,6 +28,7 @@ const (
 // Satisfies Logger and LoggerBinder interfaces
 type FileLogger struct {
 	name          string
+	dir			  string
 	isInit        bool
 	done          chan struct{}
 	isRunning     atomic.Bool
@@ -40,21 +41,22 @@ type FileLogger struct {
 	streamPool    sync.Pool
 }
 
-func NewFileLogger(name string) *FileLogger {
-	if err := os.MkdirAll("/var/log/sentinel", 0755); err != nil {
-		panic("Failed to create log directory: " + err.Error())
+func NewFileLogger(name string, dir string) (*FileLogger, error) {
+	if err := os.MkdirAll(dir, 0640); err != nil {
+		return nil, err
 	}
 
 	logger := &FileLogger{
 		name:      name,
+		dir:	   dir,
 		done:      make(chan struct{}),
 		disruptor: structs.NewDisruptor[*LogEntry](),
-		fallback: structs.NewWorkerPool(context.Background(), &structs.WorkerPoolOptions{
+		fallback:  structs.NewWorkerPool(context.Background(), &structs.WorkerPoolOptions{
 			BatchSize:   fallbackBatchSize,
 			StopTimeout: stopTimeout,
 		}),
 		forwardings: []Logger{},
-		streamPool: sync.Pool{
+		streamPool:  sync.Pool{
 			New: func() any {
 				return jsoniter.NewStream(jsoniter.ConfigFastest, nil, 1024)
 			},
@@ -62,31 +64,17 @@ func NewFileLogger(name string) *FileLogger {
 	}
 	logger.taskProducer = newTaskProducer(logger)
 
-	return logger
+	return logger, nil
 }
 
-func (l *FileLogger) Init(dir string) {
+func (l *FileLogger) Init() {
 	fileName := fmt.Sprintf(
 		"%s:%s[%s].log",
 		l.name, serviceInstance, time.Now().Format(time.RFC3339),
 	)
 
-	filePath := dir + fileName
-
-	_, err := os.Stat(dir)
-	if err != nil {
-		if err == os.ErrNotExist {
-			fileLog.Fatal(
-				"Failed to initialize log module",
-				"Log directory doesn't exist: " + dir,
-				nil,
-			)
-		}
-		fileLog.Fatal("Failed to initialize log module", err.Error(), nil)
-	}
-
 	f, err := os.OpenFile(
-		filePath,
+		l.dir + fileName,
 		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
 		0640, // rw- | r-- | ---
 	)
