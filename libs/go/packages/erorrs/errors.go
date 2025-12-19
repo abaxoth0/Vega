@@ -31,3 +31,8 @@ var StatusNotFound = NewStatusError(
 	"Requested Resource Wasn't Found",
 	http.StatusNotFound,
 )
+
+var StatusTimeout = NewStatusError(
+	"Operation timeout",
+	http.StatusRequestTimeout,
+)
