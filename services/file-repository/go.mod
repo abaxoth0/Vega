@@ -3,9 +3,10 @@ module vega_file_repository
 go 1.23.0
 
 require (
+	github.com/abaxoth0/Vega/common/protobuf v0.0.0-20251219142355-928b5d2a44ce
 	github.com/abaxoth0/Vega/libs/go v0.0.0-00010101000000-000000000000
-	github.com/gabriel-vasile/mimetype v1.4.11
 	github.com/minio/minio-go/v7 v7.0.95
+	google.golang.org/grpc v1.77.0
 )
 
 require (
@@ -22,10 +23,12 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/tinylib/msgp v1.3.0 // indirect
-	golang.org/x/crypto v0.39.0 // indirect
-	golang.org/x/net v0.41.0 // indirect
-	golang.org/x/sys v0.33.0 // indirect
-	golang.org/x/text v0.26.0 // indirect
+	golang.org/x/crypto v0.46.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/sys v0.39.0 // indirect
+	golang.org/x/text v0.32.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20251022142026-3a174f9686a8 // indirect
+	google.golang.org/protobuf v1.36.10 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
