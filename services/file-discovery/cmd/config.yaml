@@ -2,7 +2,7 @@
 ### DATABASE ###
 db-default-queuery-timeout: 5s
 
-db-skip-post-connection: false
+db-skip-post-connection: true
 
 ### CACHE ###
 cache-pool-timeout: 200ms

@@ -1,0 +1,83 @@
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  primary_postgres_data:
+  replica_postgres_data:
+  redis_data:
+
+services:
+  postgres-primary:
+    image: postgres:17.2
+    env_file:
+      - ./cmd/.env
+    environment:
+      - POSTGRES_USER=${PRIMARY_DB_USER}
+      - POSTGRES_PASSWORD=${PRIMARY_DB_PASSWORD}
+      - POSTGRES_DB=${PRIMARY_DB_NAME}
+      - PGDATA=/var/lib/postgresql/primary_data
+    ports: # TODO: Remove this in production, to make DB accessible only by other images inside of docker compose network
+      - "${PRIMARY_DB_PORT}:${PRIMARY_DB_PORT}"
+    volumes:
+      - primary_postgres_data:/var/lib/postgresql/primary_data
+      - ./configs/postgresql.primary.conf:/etc/postgresql/primary.conf
+      - ./configs/pg_hba.primary.conf:/etc/postgresql/pg_hba.primary.conf
+      - ./docker-db-init:/docker-entrypoint-initdb.d
+    command: postgres -c config_file=/etc/postgresql/primary.conf -c port=5443 -c hba_file=/etc/postgresql/pg_hba.primary.conf
+    healthcheck:
+      # TODO change DB
+      test: ["CMD-SHELL", "pg_isready -U $${PRIMARY_DB_USER} -d sentinel -p 5443"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - default
+
+  postgres-replica:
+    image: postgres:17.2
+    env_file:
+      - ./cmd/.env
+    depends_on:
+      - postgres-primary
+    environment:
+      - POSTGRES_USER=${REPLICA_DB_USER}
+      - POSTGRES_PASSWORD=${REPLICA_DB_PASSWORD}
+      - POSTGRES_DB=${REPLICA_DB_NAME}
+      - PGDATA=/var/lib/postgresql/replica_data
+    ports: # TODO: Remove this in production, to make DB accessible only by other images inside of docker compose network
+      - "${REPLICA_DB_PORT}:${REPLICA_DB_PORT}"
+    volumes:
+      - replica_postgres_data:/var/lib/postgresql/replica_data
+      - ./configs/postgresql.replica.conf:/etc/postgresql/replica.conf
+      - ./configs/pg_hba.replica.conf:/etc/postgresql/pg_hba.replica.conf
+      - ./docker-db-init:/docker-entrypoint-initdb.d
+      - ./scripts/docker-init-replica.sh:/docker-entrypoint-initdb.d/init-replica.sh
+    command: >
+      sh -c "
+      chmod +x /docker-entrypoint-initdb.d/init-replica.sh &&
+      /docker-entrypoint-initdb.d/init-replica.sh
+      "
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${REPLICA_DB_USER} -d sentinel -p 5444"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - default
+
+  redis:
+    image: redis:7.2.5-alpine
+    ports:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - default
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
