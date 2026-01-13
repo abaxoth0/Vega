@@ -18,28 +18,26 @@ type FileStatus int
 
 const (
 	ActiveFileStatus FileStatus = 1 + iota
-	DeletedFileStatus
 	ArchivedFileStatus
 	PendingFilestatus
 )
 
+const DefaultFileStatus = ActiveFileStatus
+
 const (
 	activeFileStatusString   string = "active"
-	deletedFileStatusString  string = "deleted"
 	archivedFileStatusString string = "archived"
 	pendingFilestatusString  string = "pending"
 )
 
 var fileStatusToStrMap = map[FileStatus]string{
 	ActiveFileStatus:   activeFileStatusString,
-	DeletedFileStatus:  deletedFileStatusString,
 	ArchivedFileStatus: archivedFileStatusString,
 	PendingFilestatus:  pendingFilestatusString,
 }
 
 var strToFileStatusMap = map[string]FileStatus{
 	activeFileStatusString:   ActiveFileStatus,
-	deletedFileStatusString:  DeletedFileStatus,
 	archivedFileStatusString: ArchivedFileStatus,
 	pendingFilestatusString:  PendingFilestatus,
 }
@@ -72,15 +70,6 @@ func (s FileStatus) Validate() error {
 		return fmt.Errorf("file status \"%s\" doesn't exist", s)
 	}
 	return nil
-}
-
-const (
-	DefaultFileStatus   FileStatus = ActiveFileStatus
-	DefaultChecksumType string     = "SHA256"
-)
-
-var NewDefaultChecksumHasher = func() hash.Hash {
-	return sha256.New()
 }
 
 type FilePermissionGroup uint16
@@ -303,6 +292,8 @@ func ParseFilePermissions(permissions string) (FilePermissions, error) {
 	return NewFilePermissions(groups[0], groups[1], groups[2]), nil
 }
 
+var ChecksumHasher hash.Hash = sha256.New()
+
 type UpdatableFileMetadata struct {
 	Bucket string
 	Path   string
@@ -326,7 +317,6 @@ type GeneratedFileMetadata struct {
 	MIMEType     string
 	Size         int64
 	Checksum     string
-	ChecksumType string
 
 	UploadedBy string
 
