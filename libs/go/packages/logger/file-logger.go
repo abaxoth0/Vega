@@ -27,7 +27,6 @@ const (
 
 // Satisfies Logger and LoggerBinder interfaces
 type FileLogger struct {
-	name          string
 	dir			  string
 	isInit        bool
 	done          chan struct{}
@@ -41,13 +40,12 @@ type FileLogger struct {
 	streamPool    sync.Pool
 }
 
-func NewFileLogger(name string, dir string) (*FileLogger, error) {
+func NewFileLogger(dir string) (*FileLogger, error) {
 	if err := os.MkdirAll(dir, 0640); err != nil {
 		return nil, err
 	}
 
 	logger := &FileLogger{
-		name:      name,
 		dir:	   dir,
 		done:      make(chan struct{}),
 		disruptor: structs.NewDisruptor[*LogEntry](),
@@ -70,7 +68,7 @@ func NewFileLogger(name string, dir string) (*FileLogger, error) {
 func (l *FileLogger) Init() {
 	fileName := fmt.Sprintf(
 		"%s:%s[%s].log",
-		l.name, serviceInstance, time.Now().Format(time.RFC3339),
+		serviceName, serviceInstance, time.Now().Format(time.RFC3339),
 	)
 
 	f, err := os.OpenFile(

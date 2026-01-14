@@ -106,7 +106,7 @@ func handleCritical(entry *LogEntry) {
 
 var (
 	Default = func () *FileLogger {
-		logger, err := NewFileLogger("default", "/var/log/vega/")
+		logger, err := NewFileLogger("/var/log/vega/")
 		if err != nil {
 			fileLog.Fatal("Failed to initialize default logger", err.Error(), nil)
 		}

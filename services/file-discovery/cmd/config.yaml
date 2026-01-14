@@ -1,31 +1,22 @@
+### APP ###
+service-id: de5a61bd-a0af-493c-8442-e1f92c5c2933
+show-logs: true
+trace-logs: true
+
+### DEBUG ####
+debug-mode: true
+debug-safe-db-scans: true
+debug-log-db-queries: true
 
 ### DATABASE ###
 db-default-queuery-timeout: 5s
-
 db-skip-post-connection: true
 
 ### CACHE ###
 cache-pool-timeout: 200ms
-
 cache-operation-timeout: 100ms
-
 cache-ttl: 5m
 
-### DEBUG ####
-debug-mode: true
-
-debug-safe-db-scans: true
-
-debug-log-db-queries: true
-
-### APP ###
-service-id: 5466e0e6-0c20-4cc3-90aa-2a2c731ce49d
-
-show-logs: true
-
-trace-logs: true
-
 ### SENTRY ###
-
 sentry-trace-sample-rate: 0.1 # 10%
 
