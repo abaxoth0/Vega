@@ -15,10 +15,10 @@ func stringSuffix(m structs.Meta) string {
 		return ""
 	}
 
-	return createSuffixFromRequestMeta(m)
+	return createSuffixFromWellKnownMeta(m)
 }
 
-var wellKnownMetaFields = []string{
+var wellKnownMetaProperties = []string{
 	"addr",
 	"method",
 	"path",
@@ -26,10 +26,10 @@ var wellKnownMetaFields = []string{
 	"request_id",
 }
 
-func createSuffixFromRequestMeta(m structs.Meta) string {
+func createSuffixFromWellKnownMeta(m structs.Meta) string {
 	s := ""
-	for _, field := range wellKnownMetaFields {
-		if v, ok := m[field].(string); ok {
+	for _, prop := range wellKnownMetaProperties {
+		if v, ok := m[prop].(string); ok {
 			s += v + " "
 		}
 	}
@@ -41,8 +41,8 @@ func createSuffixFromRequestMeta(m structs.Meta) string {
 
 type Logger interface {
 	Log(entry *LogEntry)
-	// Just performs logging of an entry. (saving it into a file, sending it to stdout et cetera)
-	// This method mustn't cause any side effects and mostly required for TransmittingLogger.
+	// Just logs specified entry.
+	// This method mustn't cause any side effects. It's required for ForwardingLogger to work correctly.
 	// e.g. entry with panic level won't cause panic when
 	// forwarded to another logger, only when main logger will handle it
 	log(entry *LogEntry)
@@ -64,11 +64,11 @@ type ForwardingLogger interface {
 	// (entry will be the same for all loggers)
 	//
 	// Can't bind to self. Can't bind to one logger more then once.
-	NewTransmission(logger Logger) error
+	NewForwarding(logger Logger) error
 
 	// Removes existing forwarding.
 	// Will return error if forwarding to specified logger doesn't exist.
-	RemoveTransmission(logger Logger) error
+	RemoveForwarding(logger Logger) error
 }
 
 // Returns false if log must not be processed
@@ -83,10 +83,8 @@ func preprocess(entry *LogEntry, forwadings []Logger) bool {
 
 	if forwadings != nil && len(forwadings) != 0 {
 		for _, forwarding := range forwadings {
-			// Must call log() not Log(), since log() just doing logging
+			// Must call log() not Log(), since log() just does logging
 			// without any additional side effects.
-			// Also log() won't cause recursive forwadings.
-			// (cuz forwading handled at Log())
 			forwarding.log(entry)
 		}
 	}
