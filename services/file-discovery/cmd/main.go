@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"time"
+	"vega_file_discovery/cmd/app"
 	"vega_file_discovery/common/config"
 	DB "vega_file_discovery/packages/infrastrcuture/database"
 
@@ -12,17 +13,12 @@ import (
 var log = logger.NewSource("MAIN", logger.Default)
 
 func main() {
-	if err := logger.Default.NewForwarding(logger.Stdout); err != nil {
-		panic(err.Error())
-	}
+	app.StartInit()
+		app.InitDefault()
 
-	config.Init()
-	logger.SetServiceInstance(config.App.ServiceID)
-	logger.SetServiceName("file_discovery")
-	logger.Default.Init()
-
-	logger.Debug.Store(config.Debug.Enabled)
-	logger.Trace.Store(config.App.TraceLogsEnabled)
+		logger.Debug.Store(config.Debug.Enabled)
+		logger.Trace.Store(config.App.TraceLogsEnabled)
+	app.EndInit()
 
 	go func() {
 		if err := logger.Default.Start(config.Debug.Enabled); err != nil {
