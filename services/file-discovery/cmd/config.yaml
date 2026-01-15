@@ -10,7 +10,7 @@ debug-log-db-queries: true
 
 ### DATABASE ###
 db-default-queuery-timeout: 5s
-db-skip-post-connection: true
+db-skip-post-connection: false
 
 ### CACHE ###
 cache-pool-timeout: 200ms

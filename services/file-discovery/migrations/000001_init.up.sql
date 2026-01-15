@@ -19,6 +19,6 @@ BEGIN;
         updated_at      TIMESTAMP,
         accessed_at     TIMESTAMP,
         deleted_at      TIMESTAMP,
-        description     TEXT,
+        description     TEXT
     );
 COMMIT;
