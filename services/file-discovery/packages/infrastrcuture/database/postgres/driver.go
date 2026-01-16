@@ -3,13 +3,13 @@ package postgres
 import (
 	"vega_file_discovery/packages/infrastrcuture/database/postgres/connection"
 	"vega_file_discovery/packages/infrastrcuture/database/postgres/executor"
-	filemetatable "vega_file_discovery/packages/infrastrcuture/database/postgres/table/file_meta"
+	FileMetadataTable "vega_file_discovery/packages/infrastrcuture/database/postgres/table/file_metadata"
 	"vega_file_discovery/packages/infrastrcuture/database/postgres/transaction"
 )
 
 type (
 	ConnectionManager   = *connection.Manager
-	FileMetadataManager = *filemetatable.Manager
+	FileMetadataManager = *FileMetadataTable.Manager
 )
 
 type postgers struct {
@@ -24,7 +24,7 @@ func InitDriver() *postgers {
 
 	driver = &postgers{
 		ConnectionManager: connection,
-		FileMetadataManager: new(filemetatable.Manager),
+		FileMetadataManager: new(FileMetadataTable.Manager),
 	}
 
 	executor.Init(connection)
