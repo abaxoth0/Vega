@@ -5,6 +5,7 @@ go 1.24.0
 require (
 	github.com/abaxoth0/Vega/libs/go v0.0.0-20251219143420-dcd85117f81f
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/google/uuid v1.6.0
 	github.com/jackc/pgx/v5 v5.8.0
 	github.com/joho/godotenv v1.5.1
 	gopkg.in/yaml.v3 v3.0.1

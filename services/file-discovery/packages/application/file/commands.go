@@ -7,7 +7,7 @@ import (
 )
 
 type CreateFileMetadataCmd struct {
-	Meta *entity.UpdatableFileMetadata
+	Metadata *entity.FileMetadata
 
 	cqrs.CommandQuery
 }

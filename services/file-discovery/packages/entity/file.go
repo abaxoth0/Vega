@@ -2,6 +2,7 @@ package entity
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"hash"
@@ -292,7 +293,15 @@ func ParseFilePermissions(permissions string) (FilePermissions, error) {
 	return NewFilePermissions(groups[0], groups[1], groups[2]), nil
 }
 
-var ChecksumHasher hash.Hash = sha256.New()
+var ChecksumHasher func() hash.Hash = func() hash.Hash {
+	return sha256.New()
+}
+
+func HashAll(data []byte) string {
+	h := ChecksumHasher()
+	h.Write(data)
+	return hex.EncodeToString(h.Sum(nil))
+}
 
 type UpdatableFileMetadata struct {
 	Bucket string

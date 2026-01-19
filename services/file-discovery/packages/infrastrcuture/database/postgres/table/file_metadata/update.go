@@ -1,4 +1,4 @@
-package filemetatable
+package filemetadatatable
 
 import (
 	fileapplication "vega_file_discovery/packages/application/file"
