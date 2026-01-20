@@ -1,0 +1,21 @@
+SELECT
+    id,
+    path,
+    bucket,
+    size,
+    mime,
+    permissions,
+    status,
+    owner,
+    original_name,
+    encoding,
+    categories,
+    tags,
+    checksum,
+    uploaded_by,
+    uploaded_at,
+    accessed_at,
+    updated_at,
+    created_at,
+    description
+FROM file_metadata WHERE id = $1 AND deleted_at IS NULL;

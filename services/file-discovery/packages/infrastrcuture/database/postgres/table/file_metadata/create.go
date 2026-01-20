@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"time"
 	fileapplication "vega_file_discovery/packages/application/file"
+	dbcommon "vega_file_discovery/packages/infrastrcuture/database/postgres/common"
 	"vega_file_discovery/packages/infrastrcuture/database/postgres/connection"
 	dblog "vega_file_discovery/packages/infrastrcuture/database/postgres/db-logger"
 	"vega_file_discovery/packages/infrastrcuture/database/postgres/executor"
@@ -38,7 +39,7 @@ func (_ *Manager) CreateFileMetadata(cmd *fileapplication.CreateFileMetadataCmd)
 		cmd.Metadata.Size,
 		cmd.Metadata.MIMEType,
 		cmd.Metadata.Permissions,
-		convertFileStatus(cmd.Metadata.Status),
+		dbcommon.ConvertFileStatus(cmd.Metadata.Status),
 		cmd.Metadata.Owner,
 		cmd.Metadata.OriginalName,
 		cmd.Metadata.Encoding,

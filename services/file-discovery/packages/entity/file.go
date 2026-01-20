@@ -361,3 +361,7 @@ func (m *FileMetadata) AddCategory(category string) {
 func (m *FileMetadata) HasCategory(category string) bool {
 	return slices.Contains(m.Categories, category)
 }
+
+func (m *FileMetadata) Validate() *errs.Status {
+	return nil
+}

@@ -9,6 +9,7 @@ import (
 	"vega_file_discovery/packages/entity"
 	DB "vega_file_discovery/packages/infrastrcuture/database"
 
+	cqrs "github.com/abaxoth0/Vega/libs/go/packages/CQRS"
 	"github.com/abaxoth0/Vega/libs/go/packages/logger"
 )
 
@@ -73,11 +74,20 @@ func main() {
 		fmt.Printf("[ ERROR ] Failed to create metadata: %v\n", err.Error())
 	}
 
+	metadata, err := DB.Database.GetFileMetadataByID(&cqrs.IdTargetedCommandQuery{
+		ID: "41029ac2-7fb8-4ded-aaaf-2892f6de67f5",
+	})
+	if err != nil {
+		fmt.Printf("[ ERROR ] Failed to get file metadata: %v\n", err.Error())
+	}
+
 	if err := DB.Database.Disconnect(); err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Done (file id: %s)\n", id)
+	fmt.Printf("Get metadata result: %+v)\n", metadata)
+	fmt.Printf("id of new metadata: %s)\n", id)
+	fmt.Println("Done")
 	x := ""
 	fmt.Scan(&x)
 }
