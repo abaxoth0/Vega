@@ -340,6 +340,12 @@ type FileMetadata struct {
 	GeneratedFileMetadata
 }
 
+type DeletedFileMetadata struct {
+	FileMetadata
+
+	DeletedAt time.Time
+}
+
 func (m *FileMetadata) AddTag(tag string) {
 	if slices.Contains(m.Tags, tag) {
 		return

@@ -2,6 +2,7 @@ package executor
 
 import (
 	"database/sql"
+	"errors"
 	"vega_file_discovery/packages/entity"
 	dbcommon "vega_file_discovery/packages/infrastrcuture/database/postgres/common"
 	"vega_file_discovery/packages/infrastrcuture/database/postgres/connection"
@@ -11,23 +12,28 @@ import (
 	errs "github.com/abaxoth0/Vega/libs/go/packages/erorrs"
 )
 
-func RowFileMetadata(conType connection.Type, q *query.Query, cacheKey string) (*entity.FileMetadata, error){
+var ErrNotSoftDeleted = errors.New("Requested resource exists, but it's not soft deleted")
+
+func rowAnyFileMetadata[T *entity.FileMetadata|*entity.DeletedFileMetadata](
+	conType connection.Type, q *query.Query, cacheKey string,
+) (T, error){
 	scan, err := Row(conType, q)
 	if err != nil {
 		return nil, err;
 	}
 
-	metadata := new(entity.FileMetadata)
+	metadata := entity.FileMetadata{}
 
 	var (
 		uploadedAt sql.NullTime
 		updatedAt  sql.NullTime
 		createdAt  sql.NullTime
 		accessedAt sql.NullTime
+		deletedAt  sql.NullTime
 		rawFileStatus string
 	)
 
-	if err := scan(
+	dests := []any{
 		&metadata.ID,
 		&metadata.Path,
 		&metadata.Bucket,
@@ -47,7 +53,16 @@ func RowFileMetadata(conType connection.Type, q *query.Query, cacheKey string) (
 		&updatedAt,
 		&createdAt,
 		&metadata.Description,
-	); err != nil {
+	}
+
+	var result T
+
+	switch any(result).(type) {
+	case *entity.DeletedFileMetadata:
+		dests = append(dests, &deletedAt)
+	}
+
+	if err := scan(dests...); err != nil {
 		return nil, err;
 	}
 	if uploadedAt.Valid {
@@ -63,6 +78,19 @@ func RowFileMetadata(conType connection.Type, q *query.Query, cacheKey string) (
 		metadata.CreatedAt = createdAt.Time
 	}
 
+	switch m := any(result).(type) {
+	case *entity.DeletedFileMetadata:
+		if m == nil {
+			m = new(entity.DeletedFileMetadata)
+		}
+		if deletedAt.Valid {
+			m.DeletedAt = deletedAt.Time
+		} else {
+			return nil, ErrNotSoftDeleted
+		}
+		m.FileMetadata = metadata
+	}
+
 	var e error
 	metadata.Status, e = dbcommon.ParseFileStatus(rawFileStatus)
 	if e != nil {
@@ -76,5 +104,15 @@ func RowFileMetadata(conType connection.Type, q *query.Query, cacheKey string) (
 		return nil, errs.StatusInternalServerError
 	}
 
-	return metadata, nil
+	return result, nil
+}
+
+func RowFileMetadata(conType connection.Type, q *query.Query, cacheKey string) (*entity.FileMetadata, error){
+	return rowAnyFileMetadata[*entity.FileMetadata](conType, q, cacheKey)
+}
+
+func RowSoftDeletedFileMetadata(
+	conType connection.Type, q *query.Query, cacheKey string,
+) (*entity.DeletedFileMetadata, error){
+	return rowAnyFileMetadata[*entity.DeletedFileMetadata](conType, q, cacheKey)
 }

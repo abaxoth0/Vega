@@ -81,11 +81,27 @@ func main() {
 		fmt.Printf("[ ERROR ] Failed to get file metadata: %v\n", err.Error())
 	}
 
+	deletedMetadata, err := DB.Database.HardDeleteFileMetadata(&cqrs.IdTargetedCommandQuery{
+		ID: "1e2246d8-8904-4894-9618-848005f64f47",
+	})
+	if err != nil {
+		fmt.Printf("[ ERROR ] Failed to hard delete file metadata: %v\n", err.Error())
+		panic("cringe")
+	}
+
+	metadata, err = DB.Database.GetFileMetadataByID(&cqrs.IdTargetedCommandQuery{
+		ID: "41029ac2-7fb8-4ded-aaaf-2892f6de67f5",
+	})
+	if err == nil {
+		fmt.Printf("[ ERROR ] File metadata wasn't deleted")
+	}
+
 	if err := DB.Database.Disconnect(); err != nil {
 		panic(err)
 	}
 
 	fmt.Printf("Get metadata result: %+v)\n", metadata)
+	fmt.Printf("Deleted metadata: %+v)\n", deletedMetadata)
 	fmt.Printf("id of new metadata: %s)\n", id)
 	fmt.Println("Done")
 	x := ""
