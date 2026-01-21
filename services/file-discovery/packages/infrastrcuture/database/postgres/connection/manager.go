@@ -170,7 +170,9 @@ func (m *Manager) Disconnect() error {
 
 // Don't forget to release connection
 func (m *Manager) AcquireConnection(conType Type) (*pgxpool.Conn, *errs.Status) {
-	dblog.Logger.Trace("Acquiring connection...", nil)
+	conTypeStr := common.Ternary(conType == Primary, "primary", "replica")
+
+	dblog.Logger.Trace("Acquiring connection from "+conTypeStr+" pool...", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
@@ -183,13 +185,21 @@ func (m *Manager) AcquireConnection(conType Type) (*pgxpool.Conn, *errs.Status) 
 	case Replica:
 		pool = m.ReplicaPool
 	default:
-		dblog.Logger.Panic("Failed to acquire connection", "Unknown connection type received", nil)
+		dblog.Logger.Panic(
+			"Failed to acquire connection from "+conTypeStr+" pool",
+			"Unknown connection type received",
+			nil,
+		)
 	}
 
 	connection, err := pool.Acquire(ctx)
 	if err != nil {
 		if err == context.DeadlineExceeded {
-			dblog.Logger.Error("Failed to acquire connection", errs.StatusTimeout.Error(), nil)
+			dblog.Logger.Error(
+				"Failed to acquire connection from "+conTypeStr+" pool",
+				errs.StatusTimeout.Error(),
+				nil,
+			)
 			return nil, errs.StatusTimeout
 		}
 
@@ -198,7 +208,7 @@ func (m *Manager) AcquireConnection(conType Type) (*pgxpool.Conn, *errs.Status) 
 		return nil, errs.StatusInternalServerError
 	}
 
-	dblog.Logger.Trace("Acquiring connection: OK", nil)
+	dblog.Logger.Trace("Acquiring connection from "+conTypeStr+" pool: OK", nil)
 
 	return connection, nil
 }
