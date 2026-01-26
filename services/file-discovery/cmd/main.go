@@ -6,7 +6,6 @@ import (
 	"vega_file_discovery/cmd/app"
 	"vega_file_discovery/common/config"
 	fileapplication "vega_file_discovery/packages/application/file"
-	"vega_file_discovery/packages/entity"
 	DB "vega_file_discovery/packages/infrastrcuture/database"
 
 	cqrs "github.com/abaxoth0/Vega/libs/go/packages/CQRS"
@@ -41,68 +40,79 @@ func main() {
 		panic(err)
 	}
 
-	fileContent := "some text idk..."
+	// fileContent := "some text idk..."
+	//
+	// _, err := DB.Database.CreateFileMetadata(&fileapplication.CreateFileMetadataCmd{
+	// 	Metadata: &entity.FileMetadata{
+	// 		UpdatableFileMetadata: entity.UpdatableFileMetadata{
+	// 			Bucket: "ced077c7-08de-4237-9358-9778780e0592",
+	// 			Path:   "/example.txt",
+	// 			Encoding: "UTF-8",
+	// 			Owner: "cf2dbfb0-deeb-4c3c-9679-946dd31e9dd7",
+	// 			Permissions: entity.NewFilePermissions(
+	// 				entity.ReadFilePermission|entity.UpdateFilePermission|entity.DeleteFilePermission,
+	// 				entity.ReadFilePermission,
+	// 				0,
+	// 			),
+	// 			Categories: []string{"test", "example", "dev"},
+	// 			Tags: []string{"testing"},
+	// 			Status: entity.ActiveFileStatus,
+	// 		},
+	// 		GeneratedFileMetadata: entity.GeneratedFileMetadata{
+	// 			OriginalName: "example.txt",
+	// 			MIMEType: "text/plain",
+	// 			Size: int64(len(fileContent)),
+	// 			// Checksum: string(entity.ChecksumHasher().Sum([]byte(fileContent))),
+	// 			Checksum: entity.HashAll([]byte(fileContent)),
+	// 			UploadedBy: "cf2dbfb0-deeb-4c3c-9679-946dd31e9dd7",
+	// 		},
+	// 	},
+	// })
+	//
+	// if err != nil {
+	// 	fmt.Printf("[ ERROR ] Failed to create metadata: %v\n", err.Error())
+	// }
 
-	id, err := DB.Database.CreateFileMetadata(&fileapplication.CreateFileMetadataCmd{
-		Metadata: &entity.FileMetadata{
-			UpdatableFileMetadata: entity.UpdatableFileMetadata{
-				Bucket: "ced077c7-08de-4237-9358-9778780e0592",
-				Path:   "/example.txt",
-				Encoding: "UTF-8",
-				Owner: "cf2dbfb0-deeb-4c3c-9679-946dd31e9dd7",
-				Permissions: entity.NewFilePermissions(
-					entity.ReadFilePermission|entity.UpdateFilePermission|entity.DeleteFilePermission,
-					entity.ReadFilePermission,
-					0,
-				),
-				Categories: []string{"test", "example", "dev"},
-				Tags: []string{"testing"},
-				Status: entity.ActiveFileStatus,
-			},
-			GeneratedFileMetadata: entity.GeneratedFileMetadata{
-				OriginalName: "example.txt",
-				MIMEType: "text/plain",
-				Size: int64(len(fileContent)),
-				// Checksum: string(entity.ChecksumHasher().Sum([]byte(fileContent))),
-				Checksum: entity.HashAll([]byte(fileContent)),
-				UploadedBy: "cf2dbfb0-deeb-4c3c-9679-946dd31e9dd7",
-			},
+	// metadata, err := DB.Database.GetFileMetadataByID(&cqrs.IdTargetedCommandQuery{
+	// 	ID: "41029ac2-7fb8-4ded-aaaf-2892f6de67f5",
+	// })
+	// if err != nil {
+	// 	fmt.Printf("[ ERROR ] Failed to get file metadata: %v\n", err.Error())
+	// }
+
+	// deletedMetadata, err := DB.Database.HardDeleteFileMetadata(&cqrs.IdTargetedCommandQuery{
+	// 	ID: "1e2246d8-8904-4894-9618-848005f64f47",
+	// })
+	// if err != nil {
+	// 	fmt.Printf("[ ERROR ] Failed to hard delete file metadata: %v\n", err.Error())
+	// 	panic("cringe")
+	// }
+
+	// metadata, err := DB.Database.GetFileMetadataByID(&cqrs.IdTargetedCommandQuery{
+	// 	ID: "67f160d3-81cb-4783-8c69-6c1c8c52e252",
+	// })
+	// if err != nil {
+	// 	fmt.Printf("[ ERROR ] File metadata wasn't deleted")
+	// }
+
+	newPath := "/upd/test/v5"
+	err := DB.Database.UpdateFileMetadata(&fileapplication.UpdateFileMetadataCmd{
+		Path: &newPath,
+		IdTargetedCommandQuery: cqrs.IdTargetedCommandQuery{
+			ID: "67f160d3-81cb-4783-8c69-6c1c8c52e252",
 		},
 	})
-
 	if err != nil {
-		fmt.Printf("[ ERROR ] Failed to create metadata: %v\n", err.Error())
-	}
-
-	metadata, err := DB.Database.GetFileMetadataByID(&cqrs.IdTargetedCommandQuery{
-		ID: "41029ac2-7fb8-4ded-aaaf-2892f6de67f5",
-	})
-	if err != nil {
-		fmt.Printf("[ ERROR ] Failed to get file metadata: %v\n", err.Error())
-	}
-
-	deletedMetadata, err := DB.Database.HardDeleteFileMetadata(&cqrs.IdTargetedCommandQuery{
-		ID: "1e2246d8-8904-4894-9618-848005f64f47",
-	})
-	if err != nil {
-		fmt.Printf("[ ERROR ] Failed to hard delete file metadata: %v\n", err.Error())
-		panic("cringe")
-	}
-
-	metadata, err = DB.Database.GetFileMetadataByID(&cqrs.IdTargetedCommandQuery{
-		ID: "41029ac2-7fb8-4ded-aaaf-2892f6de67f5",
-	})
-	if err == nil {
-		fmt.Printf("[ ERROR ] File metadata wasn't deleted")
+		panic(err)
 	}
 
 	if err := DB.Database.Disconnect(); err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("Get metadata result: %+v)\n", metadata)
-	fmt.Printf("Deleted metadata: %+v)\n", deletedMetadata)
-	fmt.Printf("id of new metadata: %s)\n", id)
+	// fmt.Printf("Get metadata result: %+v)\n", metadata)
+	// fmt.Printf("Deleted metadata: %+v)\n", deletedMetadata)
+	// fmt.Printf("id of new metadata: %s)\n", id)
 	fmt.Println("Done")
 	x := ""
 	fmt.Scan(&x)

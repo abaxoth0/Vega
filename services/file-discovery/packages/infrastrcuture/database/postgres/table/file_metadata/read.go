@@ -9,6 +9,7 @@ import (
 	"vega_file_discovery/packages/infrastrcuture/database/postgres/query"
 
 	cqrs "github.com/abaxoth0/Vega/libs/go/packages/CQRS"
+	"github.com/google/uuid"
 )
 
 //go:embed sql/get-file-metadata-by-id.sql
@@ -18,6 +19,10 @@ var getSoftDeletedFileMetadataByIDSql string;
 
 func (_ *Manager) GetFileMetadataByID(cqrsQuery *cqrs.IdTargetedCommandQuery) (*entity.FileMetadata, error) {
 	dblog.Logger.Info("Getting file metadata with id = "+cqrsQuery.ID+"...", nil)
+
+	if err := uuid.Validate(cqrsQuery.ID); err != nil {
+		return nil, err
+	}
 
 	metadata, err := executor.RowFileMetadata(
 		connection.Primary,

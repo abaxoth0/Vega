@@ -17,7 +17,7 @@ type QueryHandler interface {
 
 type CommandHandler interface {
 	CreateFileMetadata(cmd *CreateFileMetadataCmd) (id string, err error)
-	UpdateFileMetadata(cmd *UpdateFileMetadataCmd) (*entity.FileMetadata, error)
+	UpdateFileMetadata(cmd *UpdateFileMetadataCmd) error
 	SoftDeleteFileMetadata(cmd *cqrs.IdTargetedCommandQuery) (*entity.DeletedFileMetadata, error)
 	HardDeleteFileMetadata(cmd *cqrs.IdTargetedCommandQuery) (*entity.DeletedFileMetadata, error)
 }

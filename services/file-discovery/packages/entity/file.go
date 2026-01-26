@@ -164,6 +164,9 @@ func NewFilePermissions(owner, shared, other FilePermissionGroup) FilePermission
 	return FilePermissions(((alignmentBit | (owner << offset) | shared) << offset) | other)
 }
 
+var ErrEmptyFilePermissions = errors.New("file permissions is empty")
+var ErrInvalidFilePermissions = errors.New("invalid file permissions")
+
 var emptyFilePermissions = NewFilePermissions(0, 0, 0)
 
 func (p FilePermissions) IsEmpty() bool {
@@ -210,6 +213,10 @@ func (p FilePermissions) String() string {
 	}
 
 	return strings.Join(str, "")
+}
+
+func (p FilePermissions) RawString() string {
+	return strconv.Itoa(int(p))
 }
 
 var ErrInvalidFilePermissionGroupLength = errors.New("invalid file permission group length")
@@ -366,8 +373,4 @@ func (m *FileMetadata) AddCategory(category string) {
 
 func (m *FileMetadata) HasCategory(category string) bool {
 	return slices.Contains(m.Categories, category)
-}
-
-func (m *FileMetadata) Validate() *errs.Status {
-	return nil
 }

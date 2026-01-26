@@ -13,6 +13,7 @@ import (
 	MinIOConnection "vega_file_repository/packages/infrastructure/object-storage/MinIO/connection"
 
 	"github.com/abaxoth0/Vega/libs/go/packages/CQRS"
+	"github.com/abaxoth0/Vega/libs/go/packages/file"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -29,7 +30,7 @@ func (h *defaultCommandHandler) preprocessTargetedCommandQuery(
 	if !commandQuery.IsInit() {
 		cqrs.InitDefaultCommandQuery(commandQuery)
 	}
-	if err := FileApplication.ValidatePathFormat(path); err != nil {
+	if err := file.ValidatePathFormat(path); err != nil {
 		return err
 	}
 	return nil
@@ -51,8 +52,8 @@ func (h *defaultCommandHandler) Mkdir(cmd *FileApplication.MkdirCommand) error {
 	if err := h.preprocessTargetedCommandQuery(&cmd.CommandQuery, cmd.Path); err != nil {
 		return err
 	}
-	if ok := FileApplication.IsDirectory(cmd.Path); !ok {
-		return FileApplication.ErrFileIsNotDirectory
+	if ok := file.IsDirectory(cmd.Path); !ok {
+		return file.ErrFileIsNotDirectory
 	}
 
 	ctx, cancel := context.WithTimeout(cmd.Context, cmd.ContextTimeout)
@@ -73,7 +74,7 @@ func (h *defaultCommandHandler) UploadFile(cmd *FileApplication.UploadFileComman
 	if cmd.ContentSize <= 0 {
 		return errors.New("Content size cannot be equal or less than 0, but got " + strconv.FormatInt(cmd.ContentSize, 10))
 	}
-	if FileApplication.IsDirectory(cmd.Path) {
+	if file.IsDirectory(cmd.Path) {
 		// TODO (FEAT): Allow upload archives as directories (using flag in cmd?)
 		return errors.New("Can't upload file as directory")
 	}
@@ -150,7 +151,7 @@ func (h *defaultCommandHandler) DeleteFiles(cmd *FileApplication.DeleteFilesComm
 	}
 
 	for _, path := range cmd.Paths {
-		if err := FileApplication.ValidatePathFormat(path); err != nil {
+		if err := file.ValidatePathFormat(path); err != nil {
 			return err
 		}
 	}

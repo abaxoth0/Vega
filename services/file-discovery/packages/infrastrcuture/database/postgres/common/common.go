@@ -57,3 +57,18 @@ func ParseFileStatus(rawFileStatus string) (entity.FileStatus, error) {
 		return 0, ErrInvalidRawFileStatus
 	}
 }
+
+// Creates SQL array string from specified slices. Returns "NULL" if slices is empty.
+func SqlArrayFromSlice(s []string) string {
+	if len(s) == 0 {
+		return "NULL"
+	}
+	arr := ""
+	for i, elem := range s {
+		arr += `"`+elem+`"`
+		if i != len(s) - 1 {
+			arr += ","
+		}
+	}
+	return "'{"+arr+"}'"
+}

@@ -78,19 +78,6 @@ func rowAnyFileMetadata[T *entity.FileMetadata|*entity.DeletedFileMetadata](
 		metadata.CreatedAt = createdAt.Time
 	}
 
-	switch m := any(result).(type) {
-	case *entity.DeletedFileMetadata:
-		if m == nil {
-			m = new(entity.DeletedFileMetadata)
-		}
-		if deletedAt.Valid {
-			m.DeletedAt = deletedAt.Time
-		} else {
-			return nil, ErrNotSoftDeleted
-		}
-		m.FileMetadata = metadata
-	}
-
 	var e error
 	metadata.Status, e = dbcommon.ParseFileStatus(rawFileStatus)
 	if e != nil {
@@ -102,6 +89,22 @@ func rowAnyFileMetadata[T *entity.FileMetadata|*entity.DeletedFileMetadata](
 		// The error may occur only if raw file status in DB is invalid
 		// TODO: try to resolve this problem (apply previous status or set status to pending)
 		return nil, errs.StatusInternalServerError
+	}
+
+	switch m := any(result).(type) {
+	case *entity.DeletedFileMetadata:
+		if m == nil {
+			m = new(entity.DeletedFileMetadata)
+		}
+		if deletedAt.Valid {
+			m.DeletedAt = deletedAt.Time
+		} else {
+			return nil, ErrNotSoftDeleted
+		}
+		m.FileMetadata = metadata
+		result = any(m).(T)
+	case *entity.FileMetadata:
+		result = any(&metadata).(T)
 	}
 
 	return result, nil

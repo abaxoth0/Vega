@@ -13,7 +13,15 @@ type CreateFileMetadataCmd struct {
 }
 
 type UpdateFileMetadataCmd struct {
-	Upd  *entity.UpdatableFileMetadata
+	Bucket 		*string
+	Path   		*string
+	Encoding 	*string
+	Owner       *string
+	Permissions *entity.FilePermissions
+	Description *string
+	Categories  []string
+	Tags        []string
+	Status 		*entity.FileStatus
 
 	cqrs.IdTargetedCommandQuery
 }

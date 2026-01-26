@@ -10,6 +10,7 @@ import (
 
 	cqrs "github.com/abaxoth0/Vega/libs/go/packages/CQRS"
 	errs "github.com/abaxoth0/Vega/libs/go/packages/erorrs"
+	"github.com/abaxoth0/Vega/libs/go/packages/file"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -24,11 +25,11 @@ func (h *defaultQueryHandler) preprocessQuery(commandQuery *cqrs.CommandQuery, p
 		cqrs.InitDefaultCommandQuery(commandQuery)
 	}
 
-	err := FileApplication.ValidatePathFormat(path)
+	err := file.ValidatePathFormat(path)
 	if err != nil {
 		return err
 	}
-	if FileApplication.IsDirectory(path) {
+	if file.IsDirectory(path) {
 		// TODO need to make archive with all files in directory and send it
 		return errors.New("Requested file is directory")
 	}
